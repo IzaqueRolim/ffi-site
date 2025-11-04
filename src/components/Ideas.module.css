@@ -1,0 +1,403 @@
+/* CONTAINER PRINCIPAL */
+.container {
+  flex: 1;
+  padding: 32px;
+  background-color: #0d0d0d; /* Fundo escuro */
+  min-height: 100vh; /* Ocupa a altura total */
+}
+
+.title {
+  font-size: 2rem; /* Título maior */
+  font-weight: 700;
+  margin: 20px 0 30px;
+  color: #ecf0f1; /* Cor mais clara para o texto principal */
+  border-bottom: 2px solid #2ecc71; /* Linha sutil verde */
+  padding-bottom: 5px;
+  display: inline-block; /* Ajusta a largura da borda */
+}
+
+/* BOTÃO PRINCIPAL (+ Nova Ideia) */
+.addButton {
+  background-color: #2ecc71;
+  border: none;
+  color: #fff;
+  padding: 12px 20px; /* Mais preenchimento */
+  border-radius: 8px; /* Cantos mais arredondados */
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.addButton:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+}
+
+/* FILTRO */
+.filterContainer {
+  margin-bottom: 30px;
+}
+
+.filterInput {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background-color: #1e1e1e;
+  color: #ecf0f1;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.filterInput::placeholder {
+  color: #bdc3c7;
+}
+
+.filterInput:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+.noResults {
+    color: #bdc3c7;
+    text-align: center;
+    font-size: 1.1rem;
+    padding: 40px;
+    grid-column: 1 / -1; /* Faz ocupar toda a largura no grid */
+}
+
+
+/* CARDS DE IDEIAS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Cards maiores */
+  gap: 24px; /* Espaçamento maior entre cards */
+  margin-top: 20px;
+}
+
+.card {
+  background-color: #1e1e1e; /* Fundo do card */
+  border-radius: 12px;
+  overflow: hidden; /* Garante que a imagem se encaixe */
+  color: white;
+  text-align: left; /* Alinhamento do texto */
+  transition: box-shadow 0.3s, transform 0.3s;
+  border: 1px solid #333; /* Borda sutil */
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Efeito de elevação */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* CARROSSEL DE IMAGENS NOS CARDS */
+.imageCarousel {
+  position: relative;
+  width: 100%;
+  height: 180px; /* Altura fixa para o carrossel */
+  overflow: hidden;
+  border-bottom: 1px solid #333;
+  display: flex; /* Para centralizar o conteúdo */
+  align-items: center;
+  justify-content: center;
+}
+
+.carouselImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Recorta para cobrir a área */
+  display: block;
+  /* Transição para a imagem ao mudar, se quiser um efeito fade */
+  transition: opacity 0.5s ease-in-out;
+}
+
+.noImage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: #333;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.carouselButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  z-index: 10;
+  transition: background-color 0.2s;
+  width: 35px; /* Tamanho fixo */
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+}
+
+.carouselButton:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  opacity: 1;
+}
+
+.prevButton {
+  left: 10px;
+}
+
+.nextButton {
+  right: 10px;
+}
+
+.imageCounter {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+
+.info {
+  padding: 16px;
+}
+
+.info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #ecf0f1;
+}
+
+.info p {
+  color: #bdc3c7;
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+  /* Limita a descrição a 3 linhas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* BOTÃO DENTRO DO CARD */
+.button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+  font-weight: 600;
+}
+
+.button:hover {
+  background-color: #2980b9;
+}
+
+/* ===== MODAL ===== */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.85); /* Overlay mais escuro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  background-color: #1e1e1e; /* Fundo do modal mais escuro */
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%; /* Ajuste para responsividade */
+  max-width: 500px; /* Limite de largura */
+  color: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  animation: fadeIn 0.3s ease-out; /* Adiciona uma animação */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal h3 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #2ecc71;
+  text-align: center;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #bdc3c7;
+}
+
+.form input,
+.form textarea {
+  padding: 10px;
+  border: 1px solid #333; /* Borda sutil */
+  border-radius: 6px;
+  background-color: #2c2c2c; /* Fundo de input */
+  color: #fff;
+  margin-top: 6px;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.form input:focus,
+.form textarea:focus {
+  border-color: #2ecc71; /* Borda verde ao focar */
+  outline: none;
+}
+
+/* INPUT DE IMAGEM COM BOTÃO ADICIONAL */
+.imageInputGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.imageInputGroup input {
+  flex-grow: 1; /* O input ocupa a maior parte do espaço */
+  margin-top: 0;
+}
+
+.addButtonSmall {
+  background-color: #3498db;
+  border: none;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  line-height: 1.2; /* Garante que o + fique centralizado */
+  height: 38px; /* Ajusta a altura para combinar com o input */
+  width: 38px;
+  flex-shrink: 0; /* Impede o encolhimento */
+  margin-top: 6px; /* Para alinhar com o input */
+}
+
+.addButtonSmall:hover {
+  background-color: #2980b9;
+}
+
+/* PRÉ-VISUALIZAÇÃO DE IMAGENS */
+.imagePreview {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px dashed #3498db;
+  border-radius: 8px;
+}
+
+.imagePreview p {
+  color: #bdc3c7;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
+.imagePreview ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap; /* Quebra as imagens em várias linhas */
+  gap: 10px;
+}
+
+.imageListItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #444;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.imageListItem img {
+  width: 80px; /* Tamanho da miniatura */
+  height: 80px;
+  object-fit: cover;
+  display: block;
+}
+
+.removeImageButton {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.removeImageButton:hover {
+  opacity: 1;
+}
+
+/* BOTÕES DO MODAL */
+.modalButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.modalButtons button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.modalButtons button[type="submit"] {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.modalButtons button[type="submit"]:hover {
+  background-color: #27ae60;
+}
+
+.cancelButton {
+  background-color: #c0392b; /* Cor de Cancelar mais escura */
+  color: white;
+}
+
+.cancelButton:hover {
+  background-color: #a93226;
+}
