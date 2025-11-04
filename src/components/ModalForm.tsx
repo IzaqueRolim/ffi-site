@@ -8,7 +8,7 @@ interface ModalFormProps {
   onSubmit: (data: any) => void;
 }
 
-const ModalForm: React.FC<ModalFormProps> = ({ type, onClose, onSubmit }) => {
+const ModalForm: React.FC<ModalFormProps> = ({ type, onClose }) => {
   const [form, setForm] = useState<any>({});
 
   const handleChange = (
