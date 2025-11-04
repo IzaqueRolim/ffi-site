@@ -30,7 +30,7 @@ const Ideas: React.FC = () => {
     // Inicializa o índice da primeira imagem para cada ideia
     const initialIndexes = new Map<string, number>();
     data.forEach(idea => {
-      initialIndexes.set(idea.id, 0);
+      initialIndexes.set(idea.id ?? "", 0);
     });
     setCurrentImageIndexes(initialIndexes);
   }
@@ -135,7 +135,7 @@ const Ideas: React.FC = () => {
           <p className={styles.noResults}>Nenhuma ideia encontrada com o nome "{filterText}".</p>
         )}
         {filteredIdeas.map((idea) => {
-          const currentImageIndex = currentImageIndexes.get(idea.id) ?? 0;
+          const currentImageIndex = currentImageIndexes.get(idea.id ?? "") ?? 0;;
           const hasMultipleImages = idea.images && idea.images.length > 1;
 
           return (
@@ -152,13 +152,13 @@ const Ideas: React.FC = () => {
                       <>
                         <button
                           className={`${styles.carouselButton} ${styles.prevButton}`}
-                          onClick={() => goToPrevImage(idea.id, idea.images.length)}
+                          onClick={() => goToPrevImage(idea.id??"", idea.images.length)}
                         >
                           &#10094;
                         </button>
                         <button
                           className={`${styles.carouselButton} ${styles.nextButton}`}
-                          onClick={() => goToNextImage(idea.id, idea.images.length)}
+                          onClick={() => goToNextImage(idea.id??"", idea.images.length)}
                         >
                           &#10095;
                         </button>
