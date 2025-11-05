@@ -12,6 +12,8 @@ const Sidebar: React.FC<SidebarProps> = ({ active, onSelect }) => {
     { key: "vender", label: "Vender" },
     { key: "compras", label: "Compras" },
     { key: "ideias", label: "Ideias" },
+    { key: "historico", label: "Histórico" },
+    { key: "dashboard", label: "Dashboard" },
   ];
 
   return (

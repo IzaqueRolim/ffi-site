@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { addPurchase, getPurchases } from "../services/purchaseService";
+import { addPurchase, deletePurchase, getPurchases } from "../services/purchaseService";
 import type { Purchase } from "../types/Purchase";
 import styles from "./Purchases.module.css";
 
@@ -40,6 +40,7 @@ const Purchases: React.FC = () => {
     }
 
     const purchaseToSave: Purchase = {
+        docId:"",
         id: Date.now(), // ID temporário
         date: newPurchase.date,
         item: newPurchase.item,
@@ -109,6 +110,38 @@ const Purchases: React.FC = () => {
       return termMatch && dateMatch;
     });
   }, [purchases, searchTerm, startDate, endDate]);
+
+
+   const handleDeletePurchase = async (docId: string, productName: string) => {
+      // 1. Confirmação do Usuário
+      const isConfirmed = window.confirm(
+        `Tem certeza de que deseja excluir a compra do produto "${productName}"?`
+      );
+
+      console.log(docId)
+  
+      if (!isConfirmed) {
+        return; // Cancela a exclusão
+      }
+  
+      try {
+        // 2. Chama a função do serviço para deletar no Firestore
+        await deletePurchase(docId);
+        
+        // 3. Recarrega a lista de vendas para atualizar a interface
+        await loadPurchases();
+        
+        // Opcional: Fecha a linha expandida após a exclusão
+        setExpandedRow(null); 
+        
+        alert(`Venda de "${productName}" excluída com sucesso!`);
+      } catch (error) {
+        console.error("Erro ao excluir venda:", error);
+        alert("Houve um erro ao tentar excluir a venda.");
+      }
+    };
+  
+
 
   return (
     <div className={styles.container}>
@@ -198,7 +231,7 @@ const Purchases: React.FC = () => {
                         </div>
                         <div className={styles.expandedActions}>
                            <button className={styles.actionButtonEdit}>Editar</button>
-                           <button className={styles.actionButtonDelete}>Excluir</button>
+                           <button className={styles.actionButtonDelete} onClick={()=>handleDeletePurchase(purchase.docId,purchase.item)}>Excluir</button>
                         </div>
                       </div>
                     </td>

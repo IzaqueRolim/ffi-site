@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import styles from "./SalesTable.module.css";
-import { addSale, getSale } from "../services/salesService";
+import { addSale, deleteSale, getSale } from "../services/salesService";
 import type { Sale } from "../types/Sales";
 
 const SalesTable: React.FC = () => {
@@ -13,6 +13,8 @@ const SalesTable: React.FC = () => {
     client: "",
     category: "",
     origin: "",
+    materialCost:"",
+    quantity:""
   });
   const [sales, setSales] = useState<Sale[]>([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
@@ -40,7 +42,7 @@ const SalesTable: React.FC = () => {
     }
     
     // Converte o preço para número antes de salvar
-    const saleToSave = { ...newSale, price: Number(newSale.price) };
+    const saleToSave = { ...newSale, price: Number(newSale.price),quantity:Number(newSale.quantity),materialCost:Number(newSale.materialCost) };
     
     await addSale(saleToSave);
     await loadSales();
@@ -54,6 +56,8 @@ const SalesTable: React.FC = () => {
       client: "",
       category: "",
       origin: "",
+      materialCost:"",
+      quantity:""
     });
     setIsModalOpen(false);
   };
@@ -69,7 +73,36 @@ const SalesTable: React.FC = () => {
       client: "",
       category: "",
       origin: "",
+      quantity:"",
+      materialCost:"",
     });
+  };
+
+  const handleDeleteSale = async (docId: string, productName: string) => {
+    // 1. Confirmação do Usuário
+    const isConfirmed = window.confirm(
+      `Tem certeza de que deseja excluir a venda do produto "${productName}"?`
+    );
+
+    if (!isConfirmed) {
+      return; // Cancela a exclusão
+    }
+
+    try {
+      // 2. Chama a função do serviço para deletar no Firestore
+      await deleteSale(docId);
+      
+      // 3. Recarrega a lista de vendas para atualizar a interface
+      await loadSales();
+      
+      // Opcional: Fecha a linha expandida após a exclusão
+      setExpandedRow(null); 
+      
+      alert(`Venda de "${productName}" excluída com sucesso!`);
+    } catch (error) {
+      console.error("Erro ao excluir venda:", error);
+      alert("Houve um erro ao tentar excluir a venda.");
+    }
   };
 
   // Lógica de filtragem com useMemo para otimização
@@ -188,7 +221,7 @@ const SalesTable: React.FC = () => {
                       </div>
                       <div className={styles.expandedContentRight}>
                          <button className={styles.actionButtonEdit}>Editar</button>
-                         <button className={styles.actionButtonDelete}>Excluir</button>
+                         <button className={styles.actionButtonDelete} onClick={()=>handleDeleteSale(sale.docId, sale.product)}>Excluir</button>
                       </div>
                     </td>
                   </tr>
@@ -236,6 +269,16 @@ const SalesTable: React.FC = () => {
                   required
                 />
               </label>
+                <label>
+                Quantidade:
+                <input
+                  type="number"
+                  step="0.01"
+                  value={newSale.quantity}
+                  onChange={(e) => setNewSale({ ...newSale, quantity: e.target.value })}
+                  required
+                />
+              </label>
               <label>
                 Cliente:
                 <input
@@ -251,6 +294,15 @@ const SalesTable: React.FC = () => {
                   type="text"
                   value={newSale.category}
                   onChange={(e) => setNewSale({ ...newSale, category: e.target.value })}
+                />
+              </label>
+                <label>
+                Custo Material:
+                <input
+                  type="number"
+                  step="0.01"
+                  value={newSale.materialCost}
+                  onChange={(e) => setNewSale({ ...newSale, materialCost: e.target.value })}
                 />
               </label>
               <label>
