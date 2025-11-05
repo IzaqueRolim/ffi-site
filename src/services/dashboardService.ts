@@ -110,7 +110,7 @@ function getTopPurchasedMaterial(purchases: Purchase[]): DashboardMetrics['topPu
     return topMaterial;
 }
 
-function getMaterialCostDistribution(purchases: Purchase[], topMaterial: ReturnType<typeof getTopPurchasedMaterial>): DashboardMetrics['materialCostDistribution'] {
+function getMaterialCostDistribution(purchases: Purchase[]): DashboardMetrics['materialCostDistribution'] {
     if (purchases.length === 0) return [];
     
     const totalCost = purchases.reduce((sum, p) => sum + (p.price * p.quantity), 0);
@@ -205,7 +205,7 @@ export async function fetchDashboardMetrics(startDate?: string, endDate?: string
 
     const topPurchasedMaterial = getTopPurchasedMaterial(filteredPurchases);
     
-    const materialCostDistribution = getMaterialCostDistribution(filteredPurchases, topPurchasedMaterial);
+    const materialCostDistribution = getMaterialCostDistribution(filteredPurchases);
     
     const busiestDayOfWeek = getBusiestDayOfWeek(filteredSales);
     
