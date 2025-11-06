@@ -4,6 +4,8 @@ import { db } from "../firebaseConfig";
 import type { Idea } from "../types/Idea";
 import { storage } from "../firebaseConfig"; // Importe sua instância de storage
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { getFormattedDate } from "../utils/dateFormated";
+import { addHistoric } from "./historicoService";
 
 /**
  * Envia um arquivo para o Firebase Storage e retorna a URL de download.
@@ -46,7 +48,9 @@ const ideaCollection = collection(db, "idea");
 // Criar uma nova compra
 export async function addIdea(idea: Idea) {
   await addDoc(ideaCollection, idea);
-
+   addHistoric({ action:`Adicionou a ideia: ${idea.title}`,
+                    date: getFormattedDate(),
+                    user:"Izaque"})
   console.log("Ideia adicionada:", idea);
 }
 

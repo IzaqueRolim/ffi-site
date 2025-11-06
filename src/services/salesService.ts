@@ -1,5 +1,5 @@
 // src/services/purchaseService.ts
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore"; // Importe deleteDoc e doc
+import { collection, addDoc, getDocs, deleteDoc, doc, getDoc } from "firebase/firestore"; // Importe deleteDoc e doc
 import { db } from "../firebaseConfig";
 import type { Sale } from "../types/Sales";
 import { addHistoric } from "./historicoService";
@@ -35,11 +35,37 @@ export async function getSale(): Promise<Sale[]> {
   return list;
 }
 
-// 🆕 EXCLUIR uma venda (NOVA FUNÇÃO)
 export async function deleteSale(docId: string): Promise<void> {
-  // Cria uma referência ao documento usando o ID do Firestore
-  const saleDoc = doc(db, "sale", docId); 
-  // Deleta o documento
-  await deleteDoc(saleDoc); 
-  console.log("Venda excluída:", docId);
+  // 1. Cria uma referência ao documento usando o ID do Firestore
+  const saleDocRef = doc(db, "sale", docId); 
+  
+  try {
+    // 2. Busca os dados do documento ANTES de deletar
+    const docSnapshot = await getDoc(saleDocRef);
+
+    if (docSnapshot.exists()) {
+      const saleData = docSnapshot.data() as Sale;
+      
+      // 3. Registra a exclusão no histórico usando os dados da venda
+      await addHistoric({ 
+        action: `Excluiu a venda do cliente: ${saleData.client} (Produto: ${saleData.product}, Valor: R$ ${saleData.price})`,
+        date: getFormattedDate(),
+        user:"Izaque"
+      });
+
+      // 4. Deleta o documento
+      await deleteDoc(saleDocRef); 
+
+      console.log("Venda excluída e histórico registrado:", docId);
+
+    } else {
+      console.log("Documento de venda não encontrado para exclusão:", docId);
+      // Opcional: Tentar deletar mesmo assim, ou retornar um erro
+      await deleteDoc(saleDocRef); 
+    }
+
+  } catch (error) {
+    console.error("Erro ao excluir a venda ou registrar no histórico:", error);
+    throw error; // Propaga o erro para quem chamou a função
+  }
 }

@@ -1,170 +1,538 @@
-// src/components/Dashboard/Dashboard.tsx
+import React, { useState, useEffect } from 'react';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps } from 'recharts';
+import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package, Calendar } from 'lucide-react';
+import { fetchDashboardMetrics } from '../services/dashboardService';
+import type { DashboardMetrics } from '../types/Dashboard';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import styles from './Dashboard.module.css'; // Módulo CSS (você precisará criar este arquivo)
-import { fetchDashboardMetrics } from '../services/dashboardService'; // Ajuste o caminho se necessário
-import type { DashboardMetrics } from '../types/Dashboard'; // Ajuste o caminho se necessário
+const COLORS = ['#8b5cf6', '#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
-// Componente Auxiliar para exibir um KPI
-const KPICard: React.FC<{ title: string, value: string | number, subtitle?: string }> = ({ title, value, subtitle }) => (
-  <div className={styles.kpiCard}>
-    <p className={styles.kpiTitle}>{title}</p>
-    <p className={styles.kpiValue}>{value}</p>
-    {subtitle && <p className={styles.kpiSubtitle}>{subtitle}</p>}
-  </div>
-);
-
-// Componente Auxiliar para exibir Itens de Ranking
-const RankingItem: React.FC<{ rank: number, name: string, value: number, unit: string }> = ({ rank, name, value, unit }) => (
-    <li className={styles.rankingItem}>
-        <span className={styles.rankBadge}>{rank}</span>
-        <span className={styles.itemName}>{name}</span>
-        <span className={styles.itemValue}>{value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} {unit}</span>
-    </li>
-);
+const styles = {
+  container: {
+    minHeight: '100vh',
+    background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+    padding: '2rem',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+  },
+  maxWidth: {
+    maxWidth: '1400px',
+    margin: '0 auto'
+  },
+  header: {
+    marginBottom: '2rem'
+  },
+  headerTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: '1rem',
+    marginBottom: '1rem'
+  },
+  title: {
+    fontSize: '2.5rem',
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: '0.5rem'
+  },
+  subtitle: {
+    fontSize: '1rem',
+    color: '#64748b'
+  },
+  filterContainer: {
+    display: 'flex',
+    gap: '1rem',
+    alignItems: 'center',
+    flexWrap: 'wrap'
+  },
+  input: {
+    padding: '0.5rem 1rem',
+    borderRadius: '0.5rem',
+    border: '1px solid #cbd5e1',
+    fontSize: '0.875rem',
+    outline: 'none',
+    transition: 'border-color 0.2s'
+  },
+  button: {
+    padding: '0.5rem 1.5rem',
+    borderRadius: '0.5rem',
+    border: 'none',
+    background: '#8b5cf6',
+    color: 'white',
+    fontSize: '0.875rem',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'background 0.2s'
+  },
+  grid: {
+    display: 'grid',
+    gap: '1.5rem',
+    marginBottom: '2rem'
+  },
+  grid4: {
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))'
+  },
+  grid2: {
+    gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))'
+  },
+  grid3: {
+    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))'
+  },
+  card: {
+    background: 'white',
+    borderRadius: '1rem',
+    padding: '1.5rem',
+    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    border: '1px solid #e2e8f0',
+    transition: 'box-shadow 0.3s ease'
+  },
+  cardHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '1rem'
+  },
+  iconBox: {
+    padding: '0.75rem',
+    borderRadius: '0.75rem',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  label: {
+    fontSize: '0.875rem',
+    color: '#64748b',
+    fontWeight: '500',
+    marginBottom: '0.25rem'
+  },
+  value: {
+    fontSize: '2rem',
+    fontWeight: 'bold',
+    color: '#1e293b'
+  },
+  smallText: {
+    fontSize: '0.75rem',
+    color: '#94a3b8',
+    marginTop: '0.5rem'
+  },
+  badge: {
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '0.875rem',
+    fontWeight: '600'
+  },
+  gradientCard: {
+    borderRadius: '1rem',
+    padding: '1.5rem',
+    color: 'white',
+    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+  },
+  loading: {
+    minHeight: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+  },
+  error: {
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+    padding: '2rem'
+  }
+};
 
 const Dashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Simulação de filtros de data (opcional, mas útil)
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  // Filtros de data - padrão: últimos 30 dias
+  const [startDate, setStartDate] = useState<string>(() => {
+    const date = new Date();
+    date.setDate(date.getDate() - 30);
+    return date.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState<string>(() => {
+    return new Date().toISOString().split('T')[0];
+  });
 
-
-  const loadMetrics = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const loadMetrics = async () => {
     try {
-      // Passa os filtros de data para o serviço
-      const data = await fetchDashboardMetrics(startDate || undefined, endDate || undefined);
+      setLoading(true);
+      setError(null);
+      const data = await fetchDashboardMetrics(startDate, endDate);
       setMetrics(data);
     } catch (err) {
-      console.error("Erro ao carregar métricas do dashboard:", err);
-      setError("Não foi possível carregar as métricas. Verifique o console para detalhes.");
+      setError('Erro ao carregar as métricas. Tente novamente.');
+      console.error('Erro ao buscar métricas:', err);
     } finally {
       setLoading(false);
     }
-  }, [startDate, endDate]);
+  };
 
   useEffect(() => {
     loadMetrics();
-  }, [loadMetrics]);
+  }, []);
+
+  const handleFilter = () => {
+    loadMetrics();
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  };
+
+  const formatPercentage = (value: number) => {
+    return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
+  };
 
   if (loading) {
-    return <div className={styles.dashboardContainer}><h2 className={styles.loading}>Carregando dados do Dashboard...</h2></div>;
+    return (
+      <div style={styles.loading}>
+        <div style={{ fontSize: '1.5rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ 
+            width: '40px', 
+            height: '40px', 
+            border: '4px solid #e2e8f0',
+            borderTopColor: '#8b5cf6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+          Carregando métricas...
+        </div>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
   }
 
-  if (error || !metrics) {
-    return <div className={styles.dashboardContainer}><h2 className={styles.error}>Erro: {error || "Dados não disponíveis."}</h2></div>;
+  if (error) {
+    return (
+      <div style={styles.error}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+        <div style={{ fontSize: '1.5rem', color: '#dc2626', marginBottom: '0.5rem' }}>{error}</div>
+        <button 
+          onClick={loadMetrics}
+          style={{ ...styles.button, marginTop: '1rem' }}
+          onMouseEnter={(e) => e.currentTarget.style.background = '#7c3aed'}
+          onMouseLeave={(e) => e.currentTarget.style.background = '#8b5cf6'}
+        >
+          Tentar Novamente
+        </button>
+      </div>
+    );
   }
 
-  // --- Renderização ---
-
-  const formatCurrency = (value: number) => 
-    value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  if (!metrics) return null;
 
   return (
-    <div className={styles.dashboardContainer}>
-      <header className={styles.dashboardHeader}>
-        <h2 className={styles.title}>📊 Dashboard de Performance - Impressão 3D</h2>
-        <div className={styles.filterControls}>
-            <label>Período:</label>
-            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} title="Data Inicial" />
-            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} title="Data Final" />
-            <button onClick={loadMetrics} className={styles.refreshButton}>Atualizar</button>
-        </div>
-      </header>
-      
-      {/* SEÇÃO 1: KPIs Financeiros */}
-      <section className={styles.kpiGrid}>
-        <KPICard 
-          title="Receita Total" 
-          value={formatCurrency(metrics.totalRevenue)} 
-          subtitle={`+${metrics.revenueGrowthPercentage.toFixed(1)}% vs. Período Anterior`}
-        />
-        <KPICard 
-          title="Custo de Insumos" 
-          value={formatCurrency(metrics.totalPurchaseCost)} 
-          subtitle="Matérias-primas consumidas"
-        />
-        <KPICard 
-          title="Lucro Bruto" 
-          value={formatCurrency(metrics.grossProfit)} 
-          subtitle={`Margem: ${((metrics.grossProfit / metrics.totalRevenue) * 100).toFixed(1)}%`}
-        />
-        <KPICard 
-          title="Total de Vendas" 
-          value={`${metrics.totalSalesCount} pedidos`} 
-          subtitle={`Ticket Médio: ${formatCurrency(metrics.averageSaleValue)}`}
-        />
-      </section>
-
-      <div className={styles.contentGrid}>
-        
-        {/* SEÇÃO 2: Ranking de Vendas */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>🏆 Top Vendas por Receita</h3>
-          <ul className={styles.rankingList}>
-            {metrics.topSellingProduct ? (
-                <RankingItem 
-                    rank={1} 
-                    name={metrics.topSellingProduct.productName} 
-                    value={metrics.topSellingProduct.revenue} 
-                    unit="em Receita"
+    <div style={styles.container}>
+      <div style={styles.maxWidth}>
+        <div style={styles.header}>
+          <div style={{display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem',
+                marginBottom: '1rem'
+                }}>
+            <div>
+              <h1 style={styles.title}>Dashboard Analítico</h1>
+              <p style={styles.subtitle}>Visão geral do desempenho do negócio</p>
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>
+                  Data Início
+                </label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  style={styles.input}
                 />
-            ) : <p className={styles.noData}>Nenhuma venda registrada.</p>}
-          </ul>
-          {metrics.topCategory && (
-              <p className={styles.categoryNote}>
-                Categoria Líder: **{metrics.topCategory.categoryName}** ({formatCurrency(metrics.topCategory.revenue)})
+              </div>
+              <div>
+                <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '0.25rem' }}>
+                  Data Fim
+                </label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  style={styles.input}
+                />
+              </div>
+              <button
+                onClick={handleFilter}
+                style={styles.button}
+                onMouseEnter={(e) => e.currentTarget.style.background = '#7c3aed'}
+                onMouseLeave={(e) => e.currentTarget.style.background = '#8b5cf6'}
+              >
+                Filtrar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI Cards */}
+        <div style={{ ...styles.grid, ...styles.grid4 }}>
+          {/* Receita Total */}
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>
+              <div style={{ ...styles.iconBox, background: '#dcfce7' }}>
+                <DollarSign size={24} color="#16a34a" />
+              </div>
+              {metrics.revenueGrowthPercentage !== 0 && (
+                <span style={{
+                  ...styles.badge,
+                  color: metrics.revenueGrowthPercentage > 0 ? '#16a34a' : '#dc2626'
+                }}>
+                  {metrics.revenueGrowthPercentage > 0 ? <TrendingUp size={16} style={{ marginRight: '0.25rem' }} /> : <TrendingDown size={16} style={{ marginRight: '0.25rem' }} />}
+                  {formatPercentage(metrics.revenueGrowthPercentage)}
+                </span>
+              )}
+            </div>
+            <h3 style={styles.label}>Receita Total</h3>
+            <p style={styles.value}>{formatCurrency(metrics.totalRevenue)}</p>
+          </div>
+
+          {/* Lucro Bruto */}
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>
+              <div style={{ ...styles.iconBox, background: '#dbeafe' }}>
+                <TrendingUp size={24} color="#2563eb" />
+              </div>
+            </div>
+            <h3 style={styles.label}>Lucro Bruto</h3>
+            <p style={styles.value}>{formatCurrency(metrics.grossProfit)}</p>
+            <p style={styles.smallText}>
+              Margem: {metrics.totalRevenue > 0 ? ((metrics.grossProfit / metrics.totalRevenue) * 100).toFixed(1) : '0.0'}%
+            </p>
+          </div>
+
+          {/* Total de Vendas */}
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>
+              <div style={{ ...styles.iconBox, background: '#f3e8ff' }}>
+                <ShoppingCart size={24} color="#9333ea" />
+              </div>
+            </div>
+            <h3 style={styles.label}>Total de Vendas</h3>
+            <p style={styles.value}>{metrics.totalSalesCount}</p>
+            <p style={styles.smallText}>transações</p>
+          </div>
+
+          {/* Ticket Médio */}
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>
+              <div style={{ ...styles.iconBox, background: '#fed7aa' }}>
+                <Package size={24} color="#ea580c" />
+              </div>
+            </div>
+            <h3 style={styles.label}>Ticket Médio</h3>
+            <p style={styles.value}>{formatCurrency(metrics.averageSaleValue)}</p>
+            <p style={styles.smallText}>por venda</p>
+          </div>
+        </div>
+
+        {/* Charts */}
+        <div style={{ ...styles.grid, ...styles.grid2 }}>
+          {/* Distribuição de Custos */}
+          <div style={styles.card}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' }}>
+              Distribuição de Custos - Materiais
+            </h3>
+            {metrics.materialCostDistribution.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={metrics.materialCostDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                  label={(props: PieLabelRenderProps) => {
+                        // A propriedade que contém os seus dados originais (materialName, percentage)
+                        // na Recharts é frequentemente chamada de 'payload' (se for um objeto)
+                        const data = props.payload as { materialName: string, percentage: number };
+                        
+                        // Verifique se os dados existem antes de usar
+                        if (!data) return null; 
+
+                        return `${data.materialName}: ${data.percentage.toFixed(1)}%`;
+                    }}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="percentage"
+                  >
+                    {metrics.materialCostDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}-${entry}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
+                Sem dados de materiais no período
+              </div>
+            )}
+          </div>
+
+          {/* Análise Financeira */}
+          <div style={styles.card}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' }}>
+              Análise Financeira
+            </h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={[
+                  {
+                    name: 'Financeiro',
+                    Receita: metrics.totalRevenue,
+                    Custos: metrics.totalPurchaseCost,
+                    Lucro: metrics.grossProfit
+                  }
+                ]}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" />
+                <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
+                <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                <Legend />
+                <Bar dataKey="Receita" fill="#10b981" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="Custos" fill="#ef4444" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="Lucro" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Bottom Cards */}
+        <div style={{ ...styles.grid, ...styles.grid3 }}>
+          {/* Produto Mais Vendido */}
+          {metrics.topSellingProduct ? (
+            <div style={{
+              ...styles.gradientCard,
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+            }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.75rem', opacity: 0.9 }}>
+                🏆 Produto Mais Vendido
+              </h3>
+              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                {metrics.topSellingProduct.productName}
               </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                <div>
+                  <p style={{ fontSize: '0.875rem', opacity: 0.8 }}>Receita</p>
+                  <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>
+                    {formatCurrency(metrics.topSellingProduct.revenue)}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '0.875rem', opacity: 0.8 }}>Quantidade</p>
+                  <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>
+                    {metrics.topSellingProduct.quantity} un
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={styles.card}>
+              <p style={{ color: '#94a3b8', textAlign: 'center' }}>Sem dados de produtos</p>
+            </div>
+          )}
+
+          {/* Categoria Principal */}
+          {metrics.topCategory ? (
+            <div style={{
+              ...styles.gradientCard,
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+            }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.75rem', opacity: 0.9 }}>
+                📊 Categoria Principal
+              </h3>
+              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                {metrics.topCategory.categoryName}
+              </p>
+              <div style={{ marginTop: '1rem' }}>
+                <p style={{ fontSize: '0.875rem', opacity: 0.8 }}>Receita Total</p>
+                <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>
+                  {formatCurrency(metrics.topCategory.revenue)}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div style={styles.card}>
+              <p style={{ color: '#94a3b8', textAlign: 'center' }}>Sem dados de categorias</p>
+            </div>
+          )}
+
+          {/* Dia Mais Movimentado */}
+          {metrics.busiestDayOfWeek ? (
+            <div style={{
+              ...styles.gradientCard,
+              background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+            }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.75rem', opacity: 0.9 }}>
+                📅 Dia Mais Movimentado
+              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <Calendar size={48} style={{ opacity: 0.8 }} />
+                <p style={{ fontSize: '2rem', fontWeight: 'bold' }}>{metrics.busiestDayOfWeek}</p>
+              </div>
+              <p style={{ fontSize: '0.875rem', opacity: 0.8, marginTop: '1rem' }}>Maior volume de vendas</p>
+            </div>
+          ) : (
+            <div style={styles.card}>
+              <p style={{ color: '#94a3b8', textAlign: 'center' }}>Sem dados de vendas</p>
+            </div>
           )}
         </div>
 
-        {/* SEÇÃO 3: Ranking de Custos de Insumos */}
-        <div className={styles.card}>
-          <h3 className={styles.cardTitle}>🔥 Top 3 Materiais Mais Comprados (Custo)</h3>
-          <ul className={styles.rankingList}>
-            {metrics.materialCostDistribution.slice(0, 3).map((item, index) => (
-                <RankingItem 
-                    key={item.materialName}
-                    rank={index + 1}
-                    name={item.materialName}
-                    value={item.percentage}
-                    unit="%"
-                />
-            ))}
-          </ul>
-          {metrics.topPurchasedMaterial && (
-             <p className={styles.materialNote}>
-                Material Mais Comprado: **{metrics.topPurchasedMaterial.materialName}** ({metrics.topPurchasedMaterial.totalQuantity} unidades)
-             </p>
-          )}
-        </div>
-
-        {/* SEÇÃO 4: Insights Operacionais */}
-        <div className={styles.card}>
-            <h3 className={styles.cardTitle}>💡 Insights Operacionais</h3>
-            <div className={styles.insights}>
-                <p>📅 **Dia de Maior Pico:** <span className={styles.insightValue}>{metrics.busiestDayOfWeek || 'N/D'}</span></p>
-                {/* Aqui caberiam outros insights, como a distribuição de origem das vendas */}
+        {/* Material Mais Comprado */}
+        {metrics.topPurchasedMaterial && (
+          <div style={{ ...styles.card, marginTop: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1rem' }}>
+              🏭 Material Mais Comprado
+            </h3>
+            <div style={{ ...styles.grid, ...styles.grid3 }}>
+              <div>
+                <p style={styles.label}>Material</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>
+                  {metrics.topPurchasedMaterial.materialName}
+                </p>
+              </div>
+              <div>
+                <p style={styles.label}>Custo Total</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>
+                  {formatCurrency(metrics.topPurchasedMaterial.totalCost)}
+                </p>
+              </div>
+              <div>
+                <p style={styles.label}>Quantidade Total</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>
+                  {metrics.topPurchasedMaterial.totalQuantity} un
+                </p>
+              </div>
             </div>
-        </div>
-
-        {/* SEÇÃO 5: Distribuição de Custos (Gráfico de Pizza/Donut) */}
-        <div className={styles.card}>
-            <h3 className={styles.cardTitle}>% Distribuição de Custos de Insumos</h3>
-            <div className={styles.distributionChartPlaceholder}>
-                {/* Em uma aplicação real, você renderizaria um Gráfico de Pizza aqui (ex: Chart.js, Recharts) */}
-                {metrics.materialCostDistribution.length > 0 ? (
-                    <p>Gráfico de Pizza da Distribuição de Custos (Implementar com biblioteca de charts)</p>
-                ) : <p className={styles.noData}>Nenhuma compra registrada para análise.</p>}
-            </div>
-        </div>
-
-
+          </div>
+        )}
       </div>
     </div>
   );

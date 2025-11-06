@@ -7,7 +7,7 @@ const SalesTable: React.FC = () => {
   // Estados para a nova venda (mantidos)
   const [newSale, setNewSale] = useState({
     id: 0,
-    date: "",
+    date: new Date().toISOString().substring(0, 10) ,
     product: "",
     price: "",
     client: "",
@@ -50,7 +50,7 @@ const SalesTable: React.FC = () => {
     // Reseta o formulário
     setNewSale({
       id: 0,
-      date: "",
+      date: new Date().toISOString().substring(0, 10),
       product: "",
       price: "",
       client: "",
@@ -67,7 +67,7 @@ const SalesTable: React.FC = () => {
     // Resetar o estado do formulário ao cancelar
     setNewSale({
       id: 0,
-      date: "",
+      date: new Date().toISOString().substring(0, 10),
       product: "",
       price: "",
       client: "",
