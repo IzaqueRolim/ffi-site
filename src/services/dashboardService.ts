@@ -4,6 +4,7 @@ import type { DashboardMetrics } from "../types/Dashboard";
 import type { Sale } from "../types/Sales";
 import type { Purchase } from "../types/Purchase";
 import { getSale } from "./salesService";
+import { getFormattedDate } from "../utils/dateFormated";
 
 // --- Funções Auxiliares para Processamento de Dados ---
 
@@ -190,8 +191,8 @@ export async function fetchDashboardMetrics(startDate?: string, endDate?: string
         return dateMatch;
     };
     
-    const filteredSales = allSales.filter(sale => filterDate(sale.date, startDate, endDate));
-    const filteredPurchases = allPurchases.filter(purchase => filterDate(purchase.date, startDate, endDate));
+    const filteredSales = allSales.filter(sale => filterDate(getFormattedDate(sale.date), startDate, endDate));
+    const filteredPurchases = allPurchases.filter(purchase => filterDate(getFormattedDate(purchase.date), startDate, endDate));
 
 
     // 3. Cálculos Financeiros e de Agregação
