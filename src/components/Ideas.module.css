@@ -1,4 +1,7 @@
 /* CONTAINER PRINCIPAL */
+*{
+  color:black;
+}
 .container {
   flex: 1;
   padding: 32px;
@@ -340,6 +343,7 @@
   height: 80px;
   object-fit: cover;
   display: block;
+  background-size: contain;
 }
 
 .removeImageButton {
@@ -400,4 +404,108 @@
 
 .cancelButton:hover {
   background-color: #a93226;
+}
+
+/* ... (Seus estilos existentes) ... */
+
+/* Estilos para o Modal de Visualização (IdeaModal) */
+
+.ideaModalContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 800px; /* Tamanho maior para visualização expandida */
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.closeModalButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    z-index: 10;
+}
+
+.imageCarouselExpanded {
+    position: relative;
+    width: 100%;
+    /* Altura ajustável ou fixa para a imagem expandida */
+    max-height: 400px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.expandedCarouselImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Garante que a imagem inteira seja visível */
+    display: block;
+}
+
+.noImageExpanded {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    background-color: #f0f0f0;
+    color: #666;
+    font-size: 1.2em;
+}
+
+/* Reutilizando ou ajustando botões e contador do carrossel para o modal */
+.carouselButtonExpanded {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 5;
+    font-size: 1.5em;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.prevButtonExpanded {
+    left: 10px;
+}
+
+.nextButtonExpanded {
+    right: 10px;
+}
+
+.imageCounterExpanded {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.ideaModalInfo {
+    text-align: left;
+}
+
+.modalDescription {
+    white-space: pre-wrap; /* Permite que o texto quebre linhas corretamente e preserve espaços */
 }

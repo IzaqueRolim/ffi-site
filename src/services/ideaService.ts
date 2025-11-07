@@ -4,8 +4,7 @@ import { db } from "../firebaseConfig";
 import type { Idea } from "../types/Idea";
 import { storage } from "../firebaseConfig"; // Importe sua instância de storage
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { getFormattedDate } from "../utils/dateFormated";
-import { addHistoric } from "./historicoService";
+  import { addHistoric } from "./historicoService";
 
 /**
  * Envia um arquivo para o Firebase Storage e retorna a URL de download.
@@ -49,7 +48,7 @@ const ideaCollection = collection(db, "idea");
 export async function addIdea(idea: Idea) {
   await addDoc(ideaCollection, idea);
    addHistoric({ action:`Adicionou a ideia: ${idea.title}`,
-                    date: getFormattedDate(),
+                    date: new Date(),
                     user:"Izaque"})
   console.log("Ideia adicionada:", idea);
 }
@@ -59,6 +58,7 @@ export async function getIdea(): Promise<Idea[]> {
   const snapshot = await getDocs(ideaCollection);
   const list: Idea[] = snapshot.docs.map((doc) => ({
     id: doc.data().id,
+    docId:doc.id,
     title: doc.data().title,
     description: doc.data().description,
     images: doc.data().images

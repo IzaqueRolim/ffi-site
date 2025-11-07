@@ -1,24 +1,34 @@
 import React, { useEffect, useState, useMemo } from "react";
 import styles from "./Ideas.module.css";
 import { addIdea, getIdea } from "../services/ideaService";
+import IdeaModal from "./IdeaModal"; // Importação do novo componente Modal de Visualização
 
 import type { Idea } from "../types/Idea";
+
+// Definição do Modal de Criação (seu modal original)
+// const Ideas: React.FC = () => { ... }
 
 const Ideas: React.FC = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [currentImageUrl, setCurrentImageUrl] = useState("");
   const [newIdea, setNewIdea] = useState({
+    docId:"",
     id: "",
     title: "",
     description: "",
     images: [] as string[],
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filterText, setFilterText] = useState(""); // Novo estado para o texto do filtro
+  const [isNewIdeaModalOpen, setIsNewIdeaModalOpen] = useState(false); // Renomeado para clareza
+  const [filterText, setFilterText] = useState("");
+
+  // Estado para controlar qual ideia está sendo visualizada no modal de descrição
+  const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null); // Estado para a ideia selecionada
 
   // Estado para controlar a imagem atual do carrossel em cada card
   // Map<ideaId, currentImageIndex>
-  const [currentImageIndexes, setCurrentImageIndexes] = useState<Map<string, number>>(new Map());
+  const [currentImageIndexes, setCurrentImageIndexes] = useState<
+    Map<string, number>
+  >(new Map());
 
   useEffect(() => {
     loadIdeas();
@@ -29,7 +39,7 @@ const Ideas: React.FC = () => {
     setIdeas(data);
     // Inicializa o índice da primeira imagem para cada ideia
     const initialIndexes = new Map<string, number>();
-    data.forEach(idea => {
+    data.forEach((idea) => {
       initialIndexes.set(idea.id ?? "", 0);
     });
     setCurrentImageIndexes(initialIndexes);
@@ -65,18 +75,19 @@ const Ideas: React.FC = () => {
     await loadIdeas(); // Recarrega as ideias para incluir a nova e reinicializar carrosséis
 
     setNewIdea({
+  docId:"",
       id: "",
       title: "",
       description: "",
       images: [],
     });
     setCurrentImageUrl("");
-    setIsModalOpen(false);
+    setIsNewIdeaModalOpen(false); // Usando o novo nome do estado
   };
 
   const handleCancel = () => {
-    setIsModalOpen(false);
-    setNewIdea({ id: "", title: "", description: "", images: [] });
+    setIsNewIdeaModalOpen(false); // Usando o novo nome do estado
+    setNewIdea({ docId:"",id: "", title: "", description: "", images: [] });
     setCurrentImageUrl("");
   };
 
@@ -85,23 +96,27 @@ const Ideas: React.FC = () => {
     if (!filterText) {
       return ideas;
     }
-    return ideas.filter(idea =>
+    return ideas.filter((idea) =>
       idea.title.toLowerCase().includes(filterText.toLowerCase())
     );
   }, [ideas, filterText]);
 
   // Funções para navegação do carrossel
   const goToNextImage = (ideaId: string, totalImages: number) => {
-    setCurrentImageIndexes(prev => {
+    // individualmente por `ideaId`.
+    setCurrentImageIndexes((prev) => {
       const newMap = new Map(prev);
       const currentIndex = newMap.get(ideaId) ?? 0;
       newMap.set(ideaId, (currentIndex + 1) % totalImages);
+      console.log(newMap)
       return newMap;
     });
   };
 
   const goToPrevImage = (ideaId: string, totalImages: number) => {
-    setCurrentImageIndexes(prev => {
+    // 💡 SOLUÇÃO: A lógica já estava correta, usando o Map para manter o estado
+    // individualmente por `ideaId`.
+    setCurrentImageIndexes((prev) => {
       const newMap = new Map(prev);
       const currentIndex = newMap.get(ideaId) ?? 0;
       newMap.set(ideaId, (currentIndex - 1 + totalImages) % totalImages);
@@ -109,13 +124,21 @@ const Ideas: React.FC = () => {
     });
   };
 
+  // Função para abrir o modal de visualização da ideia
+  const handleAccessIdea = (idea: Idea) => {
+    setSelectedIdea(idea);
+  };
+
+  // Função para fechar o modal de visualização
+  const handleCloseIdeaModal = () => {
+    setSelectedIdea(null);
+  };
+
   return (
     <div className={styles.container}>
-      {/* Botão para abrir o modal */}
-
       <h2 className={styles.title}>💡 Ideias</h2>
 
-      <button className={styles.addButton} onClick={() => setIsModalOpen(true)}>
+      <button className={styles.addButton} onClick={() => setIsNewIdeaModalOpen(true)}>
         + Nova Ideia
       </button>
       {/* Campo de Filtro */}
@@ -132,14 +155,17 @@ const Ideas: React.FC = () => {
       {/* Grid de Cards */}
       <div className={styles.cards}>
         {filteredIdeas.length === 0 && (
-          <p className={styles.noResults}>Nenhuma ideia encontrada com o nome "{filterText}".</p>
+          <p className={styles.noResults}>
+            Nenhuma ideia encontrada com o nome "{filterText}".
+          </p>
         )}
-        {filteredIdeas.map((idea) => {
-          const currentImageIndex = currentImageIndexes.get(idea.id ?? "") ?? 0;;
+        {filteredIdeas.map((idea,index) => {
+          const currentImageIndex =
+            currentImageIndexes.get(idea.id ?? "") ?? 0;
           const hasMultipleImages = idea.images && idea.images.length > 1;
 
           return (
-            <div key={idea.id} className={styles.card}>
+            <div key={index} className={styles.card}>
               <div className={styles.imageCarousel}>
                 {idea.images && idea.images.length > 0 ? (
                   <>
@@ -152,22 +178,26 @@ const Ideas: React.FC = () => {
                       <>
                         <button
                           className={`${styles.carouselButton} ${styles.prevButton}`}
-                          onClick={() => goToPrevImage(idea.id??"", idea.images.length)}
+                          onClick={() =>
+                            goToPrevImage(idea.id ?? "", idea.images.length)
+                          }
                         >
                           &#10094;
                         </button>
                         <button
                           className={`${styles.carouselButton} ${styles.nextButton}`}
-                          onClick={() => goToNextImage(idea.id??"", idea.images.length)}
+                          onClick={() =>
+                            goToNextImage(idea.id ?? "", idea.images.length)
+                          }
                         >
                           &#10095;
                         </button>
                       </>
                     )}
                     {hasMultipleImages && (
-                        <div className={styles.imageCounter}>
-                            {currentImageIndex + 1} / {idea.images.length}
-                        </div>
+                      <div className={styles.imageCounter}>
+                        {currentImageIndex + 1} / {idea.images.length}
+                      </div>
                     )}
                   </>
                 ) : (
@@ -177,15 +207,25 @@ const Ideas: React.FC = () => {
               <div className={styles.info}>
                 <h3>{idea.title}</h3>
                 <p>{idea.description}</p>
-                <button className={styles.button}>Acessar</button>
+                <button
+                  className={styles.button}
+                  onClick={() => handleAccessIdea(idea)}
+                >
+                  Acessar
+                </button>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* MODAL */}
-      {isModalOpen && (
+      {/* NOVO: Modal de Visualização (Exibido quando uma ideia é selecionada) */}
+      {selectedIdea && (
+        <IdeaModal idea={selectedIdea} onClose={handleCloseIdeaModal} />
+      )}
+
+      {/* MODAL DE CRIAÇÃO DE NOVA IDEIA (Seu modal original, renomeado o estado) */}
+      {isNewIdeaModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <h3>Nova Ideia</h3>
@@ -242,10 +282,14 @@ const Ideas: React.FC = () => {
                         <img src={url} alt={`Preview ${index}`} />
                         <button
                           type="button"
-                          onClick={() => setNewIdea(prev => ({
-                            ...prev,
-                            images: prev.images.filter((_, i) => i !== index)
-                          }))}
+                          onClick={() =>
+                            setNewIdea((prev) => ({
+                              ...prev,
+                              images: prev.images.filter(
+                                (_, i) => i !== index
+                              ),
+                            }))
+                          }
                           className={styles.removeImageButton}
                         >
                           X

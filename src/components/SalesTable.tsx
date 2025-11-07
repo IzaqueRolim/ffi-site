@@ -2,12 +2,14 @@ import React, { useState, useEffect, useMemo } from "react";
 import styles from "./SalesTable.module.css";
 import { addSale, deleteSale, getSale } from "../services/salesService";
 import type { Sale } from "../types/Sales";
+import { getFormattedDate, getFormattedUSADate } from "../utils/dateFormated";
 
 const SalesTable: React.FC = () => {
   // Estados para a nova venda (mantidos)
   const [newSale, setNewSale] = useState({
+    docId:'',
     id: 0,
-    date: new Date().toISOString().substring(0, 10) ,
+    date: new Date(Date.now()),
     product: "",
     price: "",
     client: "",
@@ -17,9 +19,9 @@ const SalesTable: React.FC = () => {
     quantity:""
   });
   const [sales, setSales] = useState<Sale[]>([]);
-  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  console.log(newSale)
   // NOVOS ESTADOS PARA FILTROS
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -33,6 +35,7 @@ const SalesTable: React.FC = () => {
     const data = await getSale();
     setSales(data);
   }
+  console.log(sales)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +44,9 @@ const SalesTable: React.FC = () => {
       return;
     }
     
+    console.log(newSale)
     // Converte o preço para número antes de salvar
-    const saleToSave = { ...newSale, price: Number(newSale.price),quantity:Number(newSale.quantity),materialCost:Number(newSale.materialCost) };
+    const saleToSave = { ...newSale,date: newSale.date, price: Number(newSale.price),quantity:Number(newSale.quantity),materialCost:Number(newSale.materialCost) };
     
     await addSale(saleToSave);
     await loadSales();
@@ -50,7 +54,8 @@ const SalesTable: React.FC = () => {
     // Reseta o formulário
     setNewSale({
       id: 0,
-      date: new Date().toISOString().substring(0, 10),
+      docId:'',
+      date: new Date(),
       product: "",
       price: "",
       client: "",
@@ -66,8 +71,9 @@ const SalesTable: React.FC = () => {
     setIsModalOpen(false);
     // Resetar o estado do formulário ao cancelar
     setNewSale({
+      docId:'',
       id: 0,
-      date: new Date().toISOString().substring(0, 10),
+      date: new Date(),
       product: "",
       price: "",
       client: "",
@@ -111,7 +117,8 @@ const SalesTable: React.FC = () => {
       // 1. Filtro por Termo (Produto ou Cliente)
       const termMatch =
         sale.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.client.toLowerCase().includes(searchTerm.toLowerCase());
+        sale.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sale.category.toLowerCase().includes(searchTerm.toLowerCase())
 
       // 2. Filtro por Período (Data)
       const saleDate = new Date(sale.date);
@@ -194,21 +201,21 @@ const SalesTable: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredSales.map((sale) => (
-              <React.Fragment key={sale.id}>
+            {filteredSales.map((sale,index) => (
+              <React.Fragment key={index}>
                 <tr
                   onClick={() =>
-                    setExpandedRow(expandedRow === sale.id ? null : sale.id)
+                    setExpandedRow(expandedRow === sale.docId ? null : sale.docId)
                   }
-                  className={expandedRow === sale.id ? styles.rowActive : ''}
+                  className={expandedRow === sale.docId ? styles.rowActive : ''}
                 >
-                  <td data-label="Data">{new Date(sale.date).toLocaleDateString("pt-BR")}</td>
+                  <td data-label="Data">{getFormattedDate(sale.date)}</td>
                   <td data-label="Produto">{sale.product}</td>
                   <td data-label="Preço" className={styles.priceColumn}>R$ {sale.price.toFixed(2)}</td>
                   <td data-label="Cliente">{sale.client}</td>
                 </tr>
 
-                {expandedRow === sale.id && (
+                {expandedRow === sale.docId && (
                   <tr className={styles.expandedRow}>
                     <td colSpan={4}>
                       <div className={styles.expandedContent}>
@@ -217,6 +224,9 @@ const SalesTable: React.FC = () => {
                         </p>
                         <p>
                           <strong>Origem:</strong> <span>{sale.origin || 'N/A'}</span>
+                        </p>
+                         <p>
+                          <strong>Custo:</strong> <span>{sale.materialCost || 'N/A'}</span>
                         </p>
                       </div>
                       <div className={styles.expandedContentRight}>
@@ -245,8 +255,8 @@ const SalesTable: React.FC = () => {
                 Data:
                 <input
                   type="date"
-                  value={newSale.date}
-                  onChange={(e) => setNewSale({ ...newSale, date: e.target.value })}
+                  value={getFormattedUSADate(newSale.date)}
+                  onChange={(e) => setNewSale({ ...newSale, date: new Date(e.target.value) })}
                   required
                 />
               </label>

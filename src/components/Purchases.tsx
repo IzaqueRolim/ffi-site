@@ -2,6 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { addPurchase, deletePurchase, getPurchases } from "../services/purchaseService";
 import type { Purchase } from "../types/Purchase";
 import styles from "./Purchases.module.css";
+import { getFormattedUSADate } from "../utils/dateFormated";
 
 const Purchases: React.FC = () => {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
@@ -15,7 +16,7 @@ const Purchases: React.FC = () => {
   // Estado para o modal (adicionar nova compra)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPurchase, setNewPurchase] = useState({
-    date: new Date().toISOString().substring(0, 10), // Define a data de hoje como padrão
+    date: new Date(Date.now()), // Define a data de hoje como padrão
     item: "",
     price: "",
     quantity: "",
@@ -39,10 +40,9 @@ const Purchases: React.FC = () => {
         return;
     }
 
-    const purchaseToSave: Purchase = {
-        docId:"",
+    const purchaseToSave = {
         id: Date.now(), // ID temporário
-        date: newPurchase.date,
+        date: new Date(newPurchase.date),
         item: newPurchase.item,
         price: Number(newPurchase.price),
         quantity: Number(newPurchase.quantity),
@@ -55,7 +55,7 @@ const Purchases: React.FC = () => {
     
     // Resetar o formulário
     setNewPurchase({
-        date: new Date().toISOString().substring(0, 10),
+        date: new Date(Date.now()),
         item: "",
         price: "",
         quantity: "",
@@ -69,7 +69,7 @@ const Purchases: React.FC = () => {
     setIsModalOpen(false);
     // Resetar o estado do formulário ao cancelar
     setNewPurchase({
-        date: new Date().toISOString().substring(0, 10),
+        date: new Date(),
         item: "",
         price: "",
         quantity: "",
@@ -210,7 +210,7 @@ const Purchases: React.FC = () => {
                   <td data-label="Item">{purchase?.item}</td>
                   <td data-label="Loja">{purchase?.store}</td>
                   <td data-label="Total" className={styles.priceColumn}>
-                    R$ {(purchase.price * purchase.quantity).toFixed(2)}
+                    R$ {(purchase.price).toFixed(2)}
                   </td>
                 </tr>
 
@@ -254,8 +254,8 @@ const Purchases: React.FC = () => {
                 Data:
                 <input
                   type="date"
-                  value={newPurchase.date}
-                  onChange={(e) => setNewPurchase({ ...newPurchase, date: e.target.value })}
+                  value={getFormattedUSADate(newPurchase.date)}
+                  onChange={(e) => setNewPurchase({ ...newPurchase, date: new Date(e.target.value) })}
                   required
                 />
               </label>

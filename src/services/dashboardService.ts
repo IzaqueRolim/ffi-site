@@ -19,11 +19,11 @@ const DAYS_OF_WEEK = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira"
 function calculateProfitAndCost(sales: Sale[], purchases: Purchase[]): { totalRevenue: number, totalPurchaseCost: number, grossProfit: number } {
     
     // 1. Receita Total (Revenue)
-    const totalRevenue = sales.reduce((sum, sale) => sum + sale.price, 0);
+        const totalRevenue = sales.reduce((sum, sale) => sum + (sale.price*sale.quantity), 0);
 
     // 2. Custo Total de Insumos (Purchase Cost)
     // Aqui, agregamos o custo de todos os insumos comprados (mesmo que não se relacionem diretamente com as vendas do período)
-    const totalPurchaseCost = purchases.reduce((sum, purchase) => sum + (purchase.price * purchase.quantity), 0);
+    const totalPurchaseCost = purchases.reduce((sum, purchase) => sum + (purchase.price), 0);
     
     // 3. Lucro Bruto (Simplificado: Receita - Custo de Insumos no Período)
     const grossProfit = totalRevenue - totalPurchaseCost;
@@ -88,7 +88,7 @@ function getTopPurchasedMaterial(purchases: Purchase[]): DashboardMetrics['topPu
     const materialMap: { [key: string]: { totalCost: number, totalQuantity: number } } = {};
 
     purchases.forEach(purchase => {
-        const cost = purchase.price * purchase.quantity;
+        const cost = purchase.price;
         if (!materialMap[purchase.item]) {
             materialMap[purchase.item] = { totalCost: 0, totalQuantity: 0 };
         }

@@ -8,7 +8,7 @@ const historicCollection = collection(db, "historic");
 // Criar uma nova compra
 export async function addHistoric(historic: Historic) {
   await addDoc(historicCollection, historic);
-  console.log("Compra adicionada:", historic);
+  console.log("Historico adicionada:", historic);
 }
 
 // Ler todas as compras
@@ -18,7 +18,7 @@ export async function getHistoric(): Promise<Historic[]> {
     docId:doc.id,
     id: doc.data().id,
     action:doc.data().action,
-    date:doc.data().date,
+    date:doc.data().date.toDate(),
     user:doc.data().user,
   }));
   return list;

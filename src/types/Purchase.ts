@@ -1,8 +1,8 @@
 // src/types/Purchase.ts
 export interface Purchase {
-  docId:string,
+  docId:string;
   id: number;
-  date: string;
+  date: Date;
   item: string;
   price: number;
   quantity: number;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./Historic.module.css";
 import { getHistoric } from "../services/historicoService";
 import type { Historic } from "../types/Historico";
+import { getFormattedDate } from "../utils/dateFormated";
 
 
 
@@ -47,7 +48,7 @@ export default function HistoricList() {
             <tr key={item.docId}>
               <td>{item.action}</td>
               <td>{item.user}</td>
-              <td>{item.date}</td>
+              <td>{getFormattedDate(item.date)}</td>
             </tr>
           ))}
         </tbody>

@@ -1,7 +1,7 @@
 export interface Sale { // Esta é uma suposição para que o código funcione
   docId: string; // ID do documento no Firestore
   id: number;
-  date: string;
+  date: Date;
   product: string;
   price: number; 
   quantity:number;
