@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps, LineChart, Line } from 'recharts';
+import { BarChart, Bar, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Line } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, CreditCard, Calendar } from 'lucide-react';
 import { fetchDashboardMetrics, getDashboardChartData } from '../services/dashboardService';
 import type { DashboardMetrics } from '../types/Dashboard';
 
-
-const COLORS = ['#8b5cf6', '#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
 const styles = {
   container: {
