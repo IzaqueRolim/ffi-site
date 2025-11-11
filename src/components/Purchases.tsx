@@ -12,6 +12,7 @@ const Purchases: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [somaTotal,setSomaTotal] = useState(0)
 
   // Estado para o modal (adicionar nova compra)
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,26 +29,31 @@ const Purchases: React.FC = () => {
     loadPurchases();
   }, []);
 
+  
   async function loadPurchases() {
     const data = await getPurchases();
+    
     setPurchases(data);
+    
   }
-
+  
+  
+  
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPurchase.item || !newPurchase.price || !newPurchase.quantity) {
-        alert("Preencha os campos obrigatórios!");
-        return;
+      alert("Preencha os campos obrigatórios!");
+      return;
     }
-
+    
     const purchaseToSave = {
-        id: Date.now(), // ID temporário
-        date: new Date(newPurchase.date),
-        item: newPurchase.item,
-        price: Number(newPurchase.price),
-        quantity: Number(newPurchase.quantity),
-        store: newPurchase.store,
-        payment: newPurchase.payment,
+      id: Date.now(), // ID temporário
+      date: new Date(newPurchase.date),
+      item: newPurchase.item,
+      price: Number(newPurchase.price),
+      quantity: Number(newPurchase.quantity),
+      store: newPurchase.store,
+      payment: newPurchase.payment,
     };
     
     await addPurchase(purchaseToSave);
@@ -55,12 +61,12 @@ const Purchases: React.FC = () => {
     
     // Resetar o formulário
     setNewPurchase({
-        date: new Date(Date.now()),
-        item: "",
-        price: "",
-        quantity: "",
-        store: "",
-        payment: "",
+      date: new Date(Date.now()),
+      item: "",
+      price: "",
+      quantity: "",
+      store: "",
+      payment: "",
     });
     setIsModalOpen(false);
   };
@@ -69,12 +75,12 @@ const Purchases: React.FC = () => {
     setIsModalOpen(false);
     // Resetar o estado do formulário ao cancelar
     setNewPurchase({
-        date: new Date(),
-        item: "",
-        price: "",
-        quantity: "",
-        store: "",
-        payment: "",
+      date: new Date(),
+      item: "",
+      price: "",
+      quantity: "",
+      store: "",
+      payment: "",
     });
   };
 
@@ -83,9 +89,9 @@ const Purchases: React.FC = () => {
     return purchases.filter((purchase) => {
       // 1. Filtro por Termo (Item ou Loja)
       const termMatch =
-        purchase.item?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        purchase.store?.toLowerCase().includes(searchTerm.toLowerCase());
-
+      purchase.item?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      purchase.store?.toLowerCase().includes(searchTerm.toLowerCase());
+      
       // 2. Filtro por Período (Data)
       const purchaseDate = new Date(purchase.date);
       let dateMatch = true;
@@ -96,7 +102,7 @@ const Purchases: React.FC = () => {
           dateMatch = false;
         }
       }
-
+      
       if (dateMatch && endDate) {
         const end = new Date(endDate);
         // Ajusta a data final para incluir todo o dia
@@ -106,16 +112,22 @@ const Purchases: React.FC = () => {
           dateMatch = false;
         }
       }
-
+      
       return termMatch && dateMatch;
     });
   }, [purchases, searchTerm, startDate, endDate]);
+  
 
-
-   const handleDeletePurchase = async (docId: string, productName: string) => {
-      // 1. Confirmação do Usuário
-      const isConfirmed = window.confirm(
-        `Tem certeza de que deseja excluir a compra do produto "${productName}"?`
+  useEffect(()=>{
+    const total = filteredPurchases.reduce((sum, item) => sum + item.price, 0);
+    setSomaTotal(total)
+  },[filteredPurchases])
+  
+  
+  const handleDeletePurchase = async (docId: string, productName: string) => {
+    // 1. Confirmação do Usuário
+    const isConfirmed = window.confirm(
+      `Tem certeza de que deseja excluir a compra do produto "${productName}"?`
       );
 
       console.log(docId)
@@ -180,6 +192,8 @@ const Purchases: React.FC = () => {
         <button onClick={() => setIsModalOpen(true)} className={styles.addButton}>
           + Nova Compra
         </button>
+
+        <span style={{color:"white"}}>Total:{somaTotal}</span>
       </div>
 
       {/* Exibir mensagem se não houver resultados */}

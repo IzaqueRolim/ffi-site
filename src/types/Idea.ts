@@ -1,5 +1,6 @@
 export interface Idea {
-  docId:string,
+  docId:string;
+  indexImg?:number;
   id?: string;
   title: string;
   description: string;

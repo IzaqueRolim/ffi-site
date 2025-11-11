@@ -40,8 +40,6 @@ const rawData: Omit<Sale, 'docId'>[] = [
 ];
 
 
-
-// --- FUNÇÃO DE EXECUÇÃO ---
 export async function importSalesFromExcelData() {
     console.log(`Iniciando importação de ${rawData.length} vendas...`);
 
@@ -59,24 +57,21 @@ export async function importSalesFromExcelData() {
     }
     console.log("Processo de importação concluído.");
 }
-// Criar uma nova venda (Sem alteração)
 export async function addSale(sale: Omit<Sale, 'docId'>) {
   await addDoc(salesCollection, sale);
-  // addHistoric({ action:`${sale.quantity} venda(s) de ${sale.product} por R$${sale.price}`,
-  //               date: new Date(getFormatted)Date()new Date(,
-  //      )         user:"Izaque"})
+  addHistoric({ action:`${sale.quantity} venda(s) de ${sale.product} por R$${sale.price}`,
+                date: new Date(),
+                user:"Izaque"})
   console.log("Venda adicionada:", sale);
 }
 
-// Ler todas as vendas (Alterado para incluir o 'docId' do Firestore)
 export async function getSale(): Promise<Sale[]> {
   const q = query(salesCollection, orderBy("date", "desc"));
 
   const snapshot = await getDocs(q);
   const list: Sale[] = snapshot.docs.map((doc) => ({
-    // ATENÇÃO: Usamos doc.id para o ID do Firebase
     docId: doc.id, 
-    id: doc.data().id, // Seu ID original (assumindo que existe)
+    id: doc.data().id, 
     date: doc.data().date.toDate(),
     product: doc.data().product,
     price: doc.data().price,
@@ -85,7 +80,6 @@ export async function getSale(): Promise<Sale[]> {
     origin: doc.data().origin,
     materialCost:doc.data().materialCost,
     quantity:doc.data().quantity,
-    // Adicione um 'as unknown as Sale' se tiver problemas com a tipagem
   })) as Sale[];
 
   return list
@@ -93,36 +87,29 @@ export async function getSale(): Promise<Sale[]> {
 }
 
 export async function deleteSale(docId: string): Promise<void> {
-  // 1. Cria uma referência ao documento usando o ID do Firestore
   const saleDocRef = doc(db, "sale", docId); 
   
   try {
-    // 2. Busca os dados do documento ANTES de deletar
     const docSnapshot = await getDoc(saleDocRef);
 
     if (docSnapshot.exists()) {
       const saleData = docSnapshot.data() as Sale;
       
-      // 3. Registra a exclusão no histórico usando os dados da venda
       await addHistoric({ 
         action: `Excluiu a venda do cliente: ${saleData.client} (Produto: ${saleData.product}, Valor: R$ ${saleData.price})`,
         date: new Date(),
         user:"Izaque"
       });
 
-      // 4. Deleta o documento
       await deleteDoc(saleDocRef); 
-
       console.log("Venda excluída e histórico registrado:", docId);
-
     } else {
       console.log("Documento de venda não encontrado para exclusão:", docId);
-      // Opcional: Tentar deletar mesmo assim, ou retornar um erro
       await deleteDoc(saleDocRef); 
     }
 
   } catch (error) {
     console.error("Erro ao excluir a venda ou registrar no histórico:", error);
-    throw error; // Propaga o erro para quem chamou a função
+    throw error;
   }
 }

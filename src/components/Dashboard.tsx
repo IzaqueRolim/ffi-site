@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps } from 'recharts';
-import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package, Calendar } from 'lucide-react';
-import { fetchDashboardMetrics } from '../services/dashboardService';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, type PieLabelRenderProps, LineChart, Line } from 'recharts';
+import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, CreditCard, Calendar } from 'lucide-react';
+import { fetchDashboardMetrics, getDashboardChartData } from '../services/dashboardService';
 import type { DashboardMetrics } from '../types/Dashboard';
+
 
 const COLORS = ['#8b5cf6', '#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
@@ -192,6 +193,18 @@ const Dashboard: React.FC = () => {
     return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
   };
 
+  const [categoryChart, setCategoryChart] = useState([]);
+  const [monthlyChart, setMonthlyChart] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const data = await getDashboardChartData();
+      setCategoryChart(data.categoryChart);
+      setMonthlyChart(data.monthlyChart);
+    })();
+  }, []);
+
+
   if (loading) {
     return (
       <div style={styles.loading}>
@@ -290,7 +303,8 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* KPI Cards */}
+        
+
         <div style={{ ...styles.grid, ...styles.grid4 }}>
           {/* Receita Total */}
           <div style={styles.card}>
@@ -310,6 +324,18 @@ const Dashboard: React.FC = () => {
             </div>
             <h3 style={styles.label}>Receita Total</h3>
             <p style={styles.value}>{formatCurrency(metrics.totalRevenue)}</p>
+          </div>
+
+           {/* Total de Custos */}
+          <div style={styles.card}>
+            <div style={styles.cardHeader}>
+              <div style={{ ...styles.iconBox, background: '#f3e8ff' }}>
+                <CreditCard size={24} color="#d90606ff" />
+              </div>
+            </div>
+            <h3 style={styles.label}>Total de Custos</h3>
+            <p style={styles.value}>{formatCurrency(metrics.totalPurchaseCost)}</p>
+            <p style={styles.smallText}>transações</p>
           </div>
 
           {/* Lucro Bruto */}
@@ -337,95 +363,32 @@ const Dashboard: React.FC = () => {
             <p style={styles.value}>{metrics.totalSalesCount}</p>
             <p style={styles.smallText}>transações</p>
           </div>
+         
 
-          {/* Ticket Médio */}
-          <div style={styles.card}>
-            <div style={styles.cardHeader}>
-              <div style={{ ...styles.iconBox, background: '#fed7aa' }}>
-                <Package size={24} color="#ea580c" />
-              </div>
-            </div>
-            <h3 style={styles.label}>Ticket Médio</h3>
-            <p style={styles.value}>{formatCurrency(metrics.averageSaleValue)}</p>
-            <p style={styles.smallText}>por venda</p>
-          </div>
         </div>
-
-        {/* Charts */}
-        <div style={{ ...styles.grid, ...styles.grid2 }}>
-          {/* Distribuição de Custos */}
-          <div style={styles.card}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' }}>
-              Distribuição de Custos - Materiais
-            </h3>
-            {metrics.materialCostDistribution.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={metrics.materialCostDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                  label={(props: PieLabelRenderProps) => {
-                        // A propriedade que contém os seus dados originais (materialName, percentage)
-                        // na Recharts é frequentemente chamada de 'payload' (se for um objeto)
-                        const data = props.payload as { materialName: string, percentage: number };
-                        
-                        // Verifique se os dados existem antes de usar
-                        if (!data) return null; 
-
-                        return `${data.materialName}: ${data.percentage.toFixed(1)}%`;
-                    }}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="percentage"
-                  >
-                    {metrics.materialCostDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}-${entry}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value: number) => `${value.toFixed(1)}%`} />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>
-                Sem dados de materiais no período
-              </div>
-            )}
-          </div>
-
-          {/* Análise Financeira */}
-          <div style={styles.card}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1.5rem' }}>
-              Análise Financeira
-            </h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={[
-                  {
-                    name: 'Financeiro',
-                    Receita: metrics.totalRevenue,
-                    Custos: metrics.totalPurchaseCost,
-                    Lucro: metrics.grossProfit
-                  }
-                ]}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" />
-                <YAxis tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
-                <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Legend />
-                <Bar dataKey="Receita" fill="#10b981" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="Custos" fill="#ef4444" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="Lucro" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
+        <div style={{display:'flex'}}>
+            <div>
+              <h2>📊 Vendas por Categoria</h2>
+              <BarChart width={600} height={300} data={categoryChart}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="category" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="total" fill="#8884d8" />
               </BarChart>
-            </ResponsiveContainer>
-          </div>
+            </div>
+            <div>
+              <h2>📈 Faturamento Mensal</h2>
+              <LineChart width={600} height={300} data={monthlyChart}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="total" stroke="#82ca9d" />
+              </LineChart>
+            </div>
         </div>
-
-        {/* Bottom Cards */}
         <div style={{ ...styles.grid, ...styles.grid3 }}>
-          {/* Produto Mais Vendido */}
           {metrics.topSellingProduct ? (
             <div style={{
               ...styles.gradientCard,
@@ -505,34 +468,7 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Material Mais Comprado */}
-        {metrics.topPurchasedMaterial && (
-          <div style={{ ...styles.card, marginTop: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#1e293b', marginBottom: '1rem' }}>
-              🏭 Material Mais Comprado
-            </h3>
-            <div style={{ ...styles.grid, ...styles.grid3 }}>
-              <div>
-                <p style={styles.label}>Material</p>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>
-                  {metrics.topPurchasedMaterial.materialName}
-                </p>
-              </div>
-              <div>
-                <p style={styles.label}>Custo Total</p>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>
-                  {formatCurrency(metrics.topPurchasedMaterial.totalCost)}
-                </p>
-              </div>
-              <div>
-                <p style={styles.label}>Quantidade Total</p>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1e293b' }}>
-                  {metrics.topPurchasedMaterial.totalQuantity} un
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+    
       </div>
     </div>
   );

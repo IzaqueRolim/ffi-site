@@ -1,181 +1,240 @@
-/* src/components/Dashboard/Dashboard.module.css */
-
-.dashboardContainer {
-    padding: 20px;
-    background-color: #f4f7f9;
-    min-height: 100vh;
-    font-family: Arial, sans-serif;
-    color:black;
+:root{
+  --bg: #ffffff;
+  --muted: #6b7280;
+  --card: #f8fafc;
+  --accent: #0ea5a4;
+  --accent-2: #f59e0b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --glass: rgba(255,255,255,0.6);
+  --shadow: 0 6px 18px rgba(15,23,42,0.08);
+  --radius: 12px;
 }
 
-.dashboardHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #ddd;
+/* Container geral */
+.dashboard {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: linear-gradient(180deg, #f6f9fb 0%, #ffffff 100%);
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
+/* Cabeçalho */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
 .title {
-    color: #2c3e50;
-    font-size: 1.8em;
-    margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0;
 }
 
-.filterControls input {
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+/* Filtros */
+.filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filterInput {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6edf3;
+  background: var(--bg);
+  min-width: 120px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  box-shadow: var(--shadow);
+  outline: none;
+}
+.filterInput:focus {
+  box-shadow: 0 6px 18px rgba(14,165,164,0.12);
+  border-color: var(--accent);
+}
+.filterActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.refreshButton {
-    padding: 8px 15px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+/* Botões */
+.btn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
-
-.refreshButton:hover {
-    background-color: #2980b9;
+.btn.secondary {
+  background: #f3f4f6;
+  color: #111827;
 }
-
-/* KPI Grid (Key Performance Indicators) */
-.kpiGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+.btn.ghost {
+  background: transparent;
+  border: 1px solid #e6edf3;
+  color: #111827;
 }
+.btn:hover { transform: translateY(-2px); }
 
-.kpiCard {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    padding: 20px;
-    border-left: 5px solid #3498db; /* Cor primária do dashboard */
+/* Métricas principais (grid) */
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
-
-.kpiTitle {
-    font-size: 0.9em;
-    color: #7f8c8d;
-    margin-top: 0;
-    margin-bottom: 5px;
+@media (min-width: 768px) {
+  .metrics { grid-template-columns: repeat(4, 1fr); }
 }
-
-.kpiValue {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #2c3e50;
-    margin: 0 0 5px 0;
-}
-
-.kpiSubtitle {
-    font-size: 0.8em;
-    color: #27ae60; /* Cor verde para indicadores positivos/detalhes */
-}
-
-/* Conteúdo Principal - Grid de Gráficos/Tabelas */
-.contentGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-}
-
 .card {
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-    padding: 20px;
+  background: var(--card);
+  padding: 14px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 80px;
 }
-
 .cardTitle {
-    color: #34495e;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-top: 0;
-    font-size: 1.2em;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+}
+.cardValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #031124;
 }
 
-/* Ranking List (Top Vendas/Custos) */
-.rankingList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* Area de gráficos */
+.panels {
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 1024px) {
+  .panels {
+    grid-template-columns: 2fr 1fr;
+    align-items: start;
+  }
+}
+.panel {
+  background: var(--bg);
+  padding: 14px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.panelHeader {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.panelTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+}
+.panelSubtitle {
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
-.rankingItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px dashed #eee;
+/* Placeholder para charts (conteiner responsivo) */
+.chartWrap {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 220px;
+  align-items: stretch;
 }
 
-.rankingItem:last-child {
-    border-bottom: none;
+/* Lista lateral: Top produtos / categorias */
+.sideList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(250,250,250,0.9), rgba(245,247,250,0.9));
+  border: 1px solid #eef2f6;
+  align-items: center;
+}
+.listItem .name {
+  font-weight: 600;
+  color: #081029;
+}
+.listItem .meta {
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 
-.rankBadge {
-    background-color: #f1c40f;
-    color: #333;
-    font-weight: bold;
-    padding: 3px 8px;
-    border-radius: 4px;
-    min-width: 25px;
-    text-align: center;
-    margin-right: 10px;
+/* Rodapé do painel com pequenas legendas */
+.panelFooter {
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
-.itemName {
-    flex-grow: 1;
-    font-weight: 500;
+/* Pequenos auxiliares */
+.kpiPositive {
+  color: var(--success);
+  font-weight: 700;
+}
+.kpiNegative {
+  color: var(--danger);
+  font-weight: 700;
 }
 
-.itemValue {
-    font-weight: bold;
-    color: #2ecc71;
+/* Estados vazios */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.95rem;
+  padding: 20px;
 }
 
-.categoryNote, .materialNote {
-    margin-top: 15px;
-    padding-top: 10px;
-    border-top: 1px solid #eee;
-    font-size: 0.9em;
+/* Ajustes finos para tabelas/grids internos (se usar tabelas) */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th, .table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.categoryNote strong, .materialNote strong {
-    color: #e74c3c;
-}
-
-/* Placeholder para Gráfico */
-.distributionChartPlaceholder {
-    min-height: 200px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #95a5a6;
-    border: 1px dashed #ccc;
-    margin-top: 15px;
-    text-align: center;
-}
-
-.insights p {
-    font-size: 1em;
-    margin-bottom: 10px;
-}
-
-.insightValue {
-    font-weight: bold;
-    color: #e67e22;
-    font-size: 1.1em;
-}
-
-.loading, .error, .noData {
-    text-align: center;
-    color: #e74c3c;
+/* Pequena responsividade para telas pequenas */
+@media (max-width: 640px) {
+  .dashboard { padding: 12px; }
+  .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .filters { width: 100%; }
+  .panel { min-height: 240px; }
 }

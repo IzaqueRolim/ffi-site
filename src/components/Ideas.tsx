@@ -5,9 +5,6 @@ import IdeaModal from "./IdeaModal"; // Importação do novo componente Modal de
 
 import type { Idea } from "../types/Idea";
 
-// Definição do Modal de Criação (seu modal original)
-// const Ideas: React.FC = () => { ... }
-
 const Ideas: React.FC = () => {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [currentImageUrl, setCurrentImageUrl] = useState("");
@@ -17,6 +14,7 @@ const Ideas: React.FC = () => {
     title: "",
     description: "",
     images: [] as string[],
+    
   });
   const [isNewIdeaModalOpen, setIsNewIdeaModalOpen] = useState(false); // Renomeado para clareza
   const [filterText, setFilterText] = useState("");
@@ -24,8 +22,6 @@ const Ideas: React.FC = () => {
   // Estado para controlar qual ideia está sendo visualizada no modal de descrição
   const [selectedIdea, setSelectedIdea] = useState<Idea | null>(null); // Estado para a ideia selecionada
 
-  // Estado para controlar a imagem atual do carrossel em cada card
-  // Map<ideaId, currentImageIndex>
   const [currentImageIndexes, setCurrentImageIndexes] = useState<
     Map<string, number>
   >(new Map());
@@ -36,7 +32,12 @@ const Ideas: React.FC = () => {
 
   async function loadIdeas() {
     const data = await getIdea();
-    setIdeas(data);
+    const ideasWithIndex = data.map((idea) => ({
+      ...idea,
+      indexImg: 0,
+    }));
+    setIdeas(ideasWithIndex);
+
     // Inicializa o índice da primeira imagem para cada ideia
     const initialIndexes = new Map<string, number>();
     data.forEach((idea) => {
@@ -75,18 +76,19 @@ const Ideas: React.FC = () => {
     await loadIdeas(); // Recarrega as ideias para incluir a nova e reinicializar carrosséis
 
     setNewIdea({
-  docId:"",
+      docId:"",
       id: "",
       title: "",
       description: "",
       images: [],
+      
     });
     setCurrentImageUrl("");
-    setIsNewIdeaModalOpen(false); // Usando o novo nome do estado
+    setIsNewIdeaModalOpen(false); 
   };
 
   const handleCancel = () => {
-    setIsNewIdeaModalOpen(false); // Usando o novo nome do estado
+    setIsNewIdeaModalOpen(false); 
     setNewIdea({ docId:"",id: "", title: "", description: "", images: [] });
     setCurrentImageUrl("");
   };
@@ -96,33 +98,43 @@ const Ideas: React.FC = () => {
     if (!filterText) {
       return ideas;
     }
+  
     return ideas.filter((idea) =>
       idea.title.toLowerCase().includes(filterText.toLowerCase())
     );
   }, [ideas, filterText]);
 
-  // Funções para navegação do carrossel
-  const goToNextImage = (ideaId: string, totalImages: number) => {
-    // individualmente por `ideaId`.
-    setCurrentImageIndexes((prev) => {
-      const newMap = new Map(prev);
-      const currentIndex = newMap.get(ideaId) ?? 0;
-      newMap.set(ideaId, (currentIndex + 1) % totalImages);
-      console.log(newMap)
-      return newMap;
-    });
+  const goToNextImage = (index: number) => {
+    setIdeas(prevIdeas =>
+      prevIdeas.map((idea, i) =>
+        i === index
+          ? {
+              ...idea,
+              indexImg:
+                ((idea.indexImg ?? 0) + 1 + idea.images.length) %
+                idea.images.length,
+            }
+          : idea
+      )
+    );
   };
 
-  const goToPrevImage = (ideaId: string, totalImages: number) => {
-    // 💡 SOLUÇÃO: A lógica já estava correta, usando o Map para manter o estado
-    // individualmente por `ideaId`.
-    setCurrentImageIndexes((prev) => {
-      const newMap = new Map(prev);
-      const currentIndex = newMap.get(ideaId) ?? 0;
-      newMap.set(ideaId, (currentIndex - 1 + totalImages) % totalImages);
-      return newMap;
-    });
-  };
+const goToPrevImage = (index: number) => {
+  setIdeas(prevIdeas =>
+    prevIdeas.map((idea, i) =>
+      i === index
+        ? {
+            ...idea,
+            indexImg:
+              ((idea.indexImg ?? 0) - 1 + idea.images.length) %
+              idea.images.length,
+          }
+        : idea
+    )
+  );
+
+};
+
 
   // Função para abrir o modal de visualização da ideia
   const handleAccessIdea = (idea: Idea) => {
@@ -170,7 +182,7 @@ const Ideas: React.FC = () => {
                 {idea.images && idea.images.length > 0 ? (
                   <>
                     <img
-                      src={idea.images[currentImageIndex]}
+                      src={idea.images[idea.indexImg?idea.indexImg:0]}
                       alt={`${idea.title}-${currentImageIndex}`}
                       className={styles.carouselImage}
                     />
@@ -179,7 +191,7 @@ const Ideas: React.FC = () => {
                         <button
                           className={`${styles.carouselButton} ${styles.prevButton}`}
                           onClick={() =>
-                            goToPrevImage(idea.id ?? "", idea.images.length)
+                            goToPrevImage(index)
                           }
                         >
                           &#10094;
@@ -187,7 +199,7 @@ const Ideas: React.FC = () => {
                         <button
                           className={`${styles.carouselButton} ${styles.nextButton}`}
                           onClick={() =>
-                            goToNextImage(idea.id ?? "", idea.images.length)
+                            goToNextImage(index)
                           }
                         >
                           &#10095;
@@ -196,7 +208,7 @@ const Ideas: React.FC = () => {
                     )}
                     {hasMultipleImages && (
                       <div className={styles.imageCounter}>
-                        {currentImageIndex + 1} / {idea.images.length}
+                        {idea.indexImg!!  + 1} / {idea.images.length}
                       </div>
                     )}
                   </>

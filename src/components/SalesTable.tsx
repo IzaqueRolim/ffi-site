@@ -21,8 +21,8 @@ const SalesTable: React.FC = () => {
   const [sales, setSales] = useState<Sale[]>([]);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  console.log(newSale)
-  // NOVOS ESTADOS PARA FILTROS
+  const [somaTotal,setSomaTotal] = useState(0)
+
   const [searchTerm, setSearchTerm] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -35,7 +35,7 @@ const SalesTable: React.FC = () => {
     const data = await getSale();
     setSales(data);
   }
-  console.log(sales)
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,7 +111,6 @@ const SalesTable: React.FC = () => {
     }
   };
 
-  // Lógica de filtragem com useMemo para otimização
   const filteredSales = useMemo(() => {
     return sales.filter((sale) => {
       // 1. Filtro por Termo (Produto ou Cliente)
@@ -147,6 +146,10 @@ const SalesTable: React.FC = () => {
     });
   }, [sales, searchTerm, startDate, endDate]);
 
+  useEffect(()=>{
+    const total = filteredSales.reduce((sum, item) => sum + item.price*item.quantity, 0);
+    setSomaTotal(total)
+  },[filteredSales])
 
   return (
     <div className={styles.container}>
@@ -185,6 +188,8 @@ const SalesTable: React.FC = () => {
         <button className={styles.addButton} onClick={() => setIsModalOpen(true)}>
           + Nova Venda
         </button>
+
+        <span style={{color:"white"}}>Total:{somaTotal}</span>
       </div>
       
       {/* Exibir mensagem se não houver resultados */}

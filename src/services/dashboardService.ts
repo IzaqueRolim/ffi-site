@@ -231,3 +231,42 @@ export async function fetchDashboardMetrics(startDate?: string, endDate?: string
 
     return metrics;
 }
+
+
+export async function getDashboardChartData(): Promise<any> {
+  const sales = await getSale();
+
+  const categoryMap: Record<string, number> = {};
+  sales.forEach((sale) => {
+    const value = sale.price * sale.quantity;
+    categoryMap[sale.category] = (categoryMap[sale.category] || 0) + value;
+  });
+
+  const categoryChart: any[] = Object.entries(categoryMap).map(
+    ([category, total]) => ({
+      category,
+      total: parseFloat(total.toFixed(2))
+    })
+  );
+
+  const monthlyMap: Record<string, number> = {};
+  sales.forEach((sale) => {
+    const date = new Date(sale.date);
+    const monthYear = `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
+    const value = sale.price * sale.quantity;
+    monthlyMap[monthYear] = (monthlyMap[monthYear] || 0) + value;
+  });
+
+  const monthlyChart: any[] = Object.entries(monthlyMap)
+    .map(([month, total]) => ({
+      month,
+      total: parseFloat(total.toFixed(2)),
+    }))
+    .sort((a, b) => {
+      const [ma, ya] = a.month.split("/").map(Number);
+      const [mb, yb] = b.month.split("/").map(Number);
+      return ya - yb || ma - mb;
+    });
+
+  return { categoryChart, monthlyChart };
+}
