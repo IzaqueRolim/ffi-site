@@ -3,6 +3,7 @@ import { BarChart, Bar, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Line } 
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, CreditCard, Calendar } from 'lucide-react';
 import { fetchDashboardMetrics, getDashboardChartData } from '../services/dashboardService';
 import type { DashboardMetrics } from '../types/Dashboard';
+import { importSalesFromExcelData } from '../services/salesService';
 
 
 const styles = {
@@ -249,6 +250,7 @@ const Dashboard: React.FC = () => {
     <div style={styles.container}>
       <div style={styles.maxWidth}>
         <div style={styles.header}>
+          <button onClick={()=>importSalesFromExcelData()}>AAAA</button>
           <div style={{display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -386,6 +388,7 @@ const Dashboard: React.FC = () => {
               </LineChart>
             </div>
         </div>
+
         <div style={{ ...styles.grid, ...styles.grid3 }}>
           {metrics.topSellingProduct ? (
             <div style={{
@@ -393,7 +396,71 @@ const Dashboard: React.FC = () => {
               background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
             }}>
               <h3 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.75rem', opacity: 0.9 }}>
-                🏆 Produto Mais Vendido
+                🏆 Produto que mais gerou receita
+              </h3>
+              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                {metrics.topSellingProduct.productName}
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                <div>
+                  <p style={{ fontSize: '0.875rem', opacity: 0.8 }}>Receita</p>
+                  <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>
+                    {formatCurrency(metrics.topSellingProduct.revenue)}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '0.875rem', opacity: 0.8 }}>Quantidade</p>
+                  <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>
+                    {metrics.topSellingProduct.quantity} un
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={styles.card}>
+              <p style={{ color: '#94a3b8', textAlign: 'center' }}>Sem dados de produtos</p>
+            </div>
+          )}
+
+           {metrics.topSellingProduct ? (
+            <div style={{
+              ...styles.gradientCard,
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+            }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.75rem', opacity: 0.9 }}>
+                🏆 Produto que mais vendido(quantidade)
+              </h3>
+              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                {metrics.topSellingProduct.productName}
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                <div>
+                  <p style={{ fontSize: '0.875rem', opacity: 0.8 }}>Receita</p>
+                  <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>
+                    {formatCurrency(metrics.topSellingProduct.revenue)}
+                  </p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '0.875rem', opacity: 0.8 }}>Quantidade</p>
+                  <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>
+                    {metrics.topSellingProduct.quantity} un
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={styles.card}>
+              <p style={{ color: '#94a3b8', textAlign: 'center' }}>Sem dados de produtos</p>
+            </div>
+          )}
+
+           {metrics.topSellingProduct ? (
+            <div style={{
+              ...styles.gradientCard,
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
+            }}>
+              <h3 style={{ fontSize: '0.875rem', fontWeight: '600', marginBottom: '0.75rem', opacity: 0.9 }}>
+                🏆 Produto que mais Lucrativo
               </h3>
               <p style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
                 {metrics.topSellingProduct.productName}

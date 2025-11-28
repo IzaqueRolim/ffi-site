@@ -9,7 +9,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ active, onSelect }) => {
   const buttons = [
-    { key: "vender", label: "Vender" },
+    { key: "vender", label: "Vendas" },
     { key: "compras", label: "Compras" },
     { key: "ideias", label: "Ideias" },
     { key: "historico", label: "Histórico" },
@@ -19,17 +19,19 @@ const Sidebar: React.FC<SidebarProps> = ({ active, onSelect }) => {
   return (
     <aside className={styles.sidebar}>
       <h1 className={styles.title}>Título</h1>
-      {buttons.map((btn) => (
-        <button
-          key={btn.key}
-          onClick={() => onSelect(btn.key)}
-          className={clsx(styles.navButton, {
-            [styles.active]: active === btn.key,
-          })}
-        >
-          {btn.label}
-        </button>
-      ))}
+      {
+        buttons.map((btn) => (
+          <button
+            key={btn.key}
+            onClick={() => onSelect(btn.key)}
+            className={clsx(styles.navButton, {
+              [styles.active]: active === btn.key,
+            })}
+          >
+            {btn.label}
+          </button>
+        ))
+      }
     </aside>
   );
 };

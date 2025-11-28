@@ -19,7 +19,7 @@ const rawData: Omit<Sale, 'docId'>[] = [
   { id: 8, date: new Date('08/09/2025'), client: 'Jobson', product: 'Placa Pai eu te amo', quantity: 1, price: 20.00, materialCost: 3.29, category: "Letreiro", origin: "Boca a Boca" },
   { id: 9, date: new Date('08/10/2025'), client: 'Raquel Rolim', product: 'Estatua pai e filha', quantity: 1, price: 30.00, materialCost: 2.41, category: "Bonecos", origin: "Boca a Boca" },
   { id: 10, date: new Date('08/10/2025'), client: 'Geise', product: 'Placa Pai eu te amo', quantity: 1, price: 20.00, materialCost: 3.29, category: "Letreiro", origin: "Boca a Boca" },
-  { id: 11, date: new Date('09/01/2025'), client: 'Larissa', product: 'Letreiro "Santa Ceia"', quantity: 1, price: 45.00, materialCost: 1.09, category: "Letreiro", origin: "Boca a Boca" },
+  { id: 11, date: new Date('09/01/2025'), client: 'Larissa', product: 'Letreiro "Santa Ceia"', quantity: 1, price: 45.00, materialCost: 5.09, category: "Letreiro", origin: "Boca a Boca" },
   { id: 12, date: new Date('09/01/2025'), client: 'Andryws', product: 'Mascara Scorpion', quantity: 1, price: 20.00, materialCost: 8.87, category: "Cosplay", origin: "Boca a Boca" },
   { id: 13, date: new Date('09/16/2025'), client: 'Andryws', product: 'Espada', quantity: 1, price: 100.00, materialCost: 70.20, category: "Cosplay", origin: "Boca a Boca" },
   { id: 14, date: new Date('09/16/2025'), client: 'Andryws', product: 'Suporte alexa', quantity: 1, price: 55.00, materialCost: 29.84, category: "Suportes", origin: "Boca a Boca" },
@@ -31,12 +31,14 @@ const rawData: Omit<Sale, 'docId'>[] = [
   { id: 20, date: new Date('09/24/2025'), client: 'Cecilia', product: 'Suporte celular fone', quantity: 1, price: 40.00, materialCost: 0.00, category: "Organizadores", origin: "Boca a Boca" },
   { id: 21, date: new Date('09/24/2025'), client: 'Emanuel', product: 'Porta Lapis Sueter', quantity: 1, price: 35.00, materialCost: 0.00, category: "Organizadores", origin: "Boca a Boca" },
   { id: 22, date: new Date('09/24/2025'), client: 'Erika', product: 'Porta Lapis Vestido', quantity: 1, price: 15.00, materialCost: 0.00, category: "Organizadores", origin: "Boca a Boca" },
-  { id: 23, date: new Date('10/01/2025'), client: 'Eduardo', product: 'Mao suporte Controle', quantity: 1, price: 0.00, materialCost: 0.00, category: "Suportes", origin: "Boca a Boca" },
+  { id: 23, date: new Date('10/01/2025'), client: 'Eduardo', product: 'Mao suporte Controle', quantity: 1, price: 60.00, materialCost: 15.00, category: "Suportes", origin: "Boca a Boca" },
   { id: 24, date: new Date('10/02/2025'), client: 'Cliente Instagram', product: 'Espada Final Fantasy', quantity: 1, price: 40.00, materialCost: 0.00, category: "Cosplay", origin: "Instagram" },
   { id: 25, date: new Date('10/02/2025'), client: 'Rosy', product: 'Medalha Corrida Das Estações', quantity: 1, price: 15.00, materialCost: 0.00, category: "Medalha", origin: "Boca a Boca" },
   { id: 26, date: new Date('09/30/2025'), client: 'Samuel', product: 'Bonequinho Miniatura Samuel Ester', quantity: 1, price: 100.00, materialCost: 0.00, category: "Boneco Personalizado", origin: "Boca a Boca" },
   { id: 27, date: new Date('10/05/2025'), client: 'Joao Bernardo', product: 'Coroa Avatar Shori', quantity: 1, price: 20.00, materialCost: 0.00, category: "Cosplay", origin: "Boca a Boca" },
   { id: 28, date: new Date('09/29/2025'), client: 'Amiga da Raquel', product: 'Medalha EBF', quantity: 2, price: 10.00, materialCost: 0.00, category: "Medalha", origin: "Boca a Boca" },
+  { id: 29, date: new Date('11/08/2025'), client: 'Neia', product: 'Letreiro "Cantinho do Café"', quantity: 1, price: 40.00, materialCost: 6.00, category: "Letreiro", origin: "Boca a Boca" },
+  { id: 30, date: new Date('11/08/2025'), client: 'Neia', product: 'Letreiro "Cantinho do Café"', quantity: 1, price: 40.00, materialCost: 6.00, category: "Letreiro", origin: "Boca a Boca" },
 ];
 
 

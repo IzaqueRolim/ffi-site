@@ -202,6 +202,8 @@ const SalesTable: React.FC = () => {
               <th>Data</th>
               <th>Produto</th>
               <th>Preço</th>
+              <th>Quantidade</th>
+              <th>Total</th>
               <th>Cliente</th>
             </tr>
           </thead>
@@ -217,13 +219,15 @@ const SalesTable: React.FC = () => {
                   <td data-label="Data">{getFormattedDate(sale.date)}</td>
                   <td data-label="Produto">{sale.product}</td>
                   <td data-label="Preço" className={styles.priceColumn}>R$ {sale.price.toFixed(2)}</td>
+                  <td data-label="Quantidade" className={styles.priceColumn}> {sale.quantity}</td>
+                  <td data-label="Total" className={styles.priceColumn}>R${(sale.price*sale.quantity).toFixed(2)}</td>
                   <td data-label="Cliente">{sale.client}</td>
                 </tr>
 
                 {expandedRow === sale.docId && (
                   <tr className={styles.expandedRow}>
                     <td colSpan={4}>
-                      <div className={styles.expandedContent}>
+                      <div  className={styles.expandedContent}>
                         <p>
                           <strong>Categoria:</strong> <span>{sale.category || 'N/A'}</span>
                         </p>

@@ -254,6 +254,10 @@
   outline: none;
 }
 
+span{
+  color:white;
+}
+
 
 .modalButtons {
   display: flex;

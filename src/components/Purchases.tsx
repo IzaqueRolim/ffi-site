@@ -206,6 +206,7 @@ const Purchases: React.FC = () => {
               <th>Data</th>
               <th>Item</th>
               <th>Loja</th>
+              <th>Quantidade</th>
               <th>Total</th>
             </tr>
           </thead>
@@ -223,6 +224,7 @@ const Purchases: React.FC = () => {
                   <td data-label="Data">{new Date(purchase?.date).toLocaleDateString("pt-BR")}</td>
                   <td data-label="Item">{purchase?.item}</td>
                   <td data-label="Loja">{purchase?.store}</td>
+                  <td data-label="Loja">{purchase?.quantity}</td>
                   <td data-label="Total" className={styles.priceColumn}>
                     R$ {(purchase.price).toFixed(2)}
                   </td>
@@ -234,13 +236,10 @@ const Purchases: React.FC = () => {
                       <div className={styles.expandedContentGroup}>
                         <div className={styles.expandedContent}>
                           <p>
-                            <strong>Preço Unitário:</strong> R$ {purchase.price?.toFixed(2)}
+                            <strong>Preço Unitário: R$ {purchase.price?.toFixed(2)}</strong> 
                           </p>
                           <p>
-                            <strong>Quantidade:</strong> {purchase.quantity}
-                          </p>
-                          <p>
-                            <strong>Forma de Pagamento:</strong> {purchase.payment}
+                            <strong>Forma de Pagamento: {purchase.payment}</strong>
                           </p>
                         </div>
                         <div className={styles.expandedActions}>
