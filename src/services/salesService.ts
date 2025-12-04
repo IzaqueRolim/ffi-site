@@ -7,7 +7,6 @@ import { addHistoric } from "./historicoService";
 
 const salesCollection = collection(db, "sale");
 
-
 const rawData: Omit<Sale, 'docId'>[] = [ 
   { id: 1, date: new Date('08/04/2025'), client: 'Iolene', product: 'Letreiro "Santa Ceia"', quantity: 1, price: 40.00, materialCost: 11.27, category: "Letreiro", origin: "Boca a Boca" },
   { id: 2, date: new Date('08/07/2025'), client: 'Irma Maria', product: 'Chaveiro "Melhor Pai"', quantity: 7, price: 3.00, materialCost: 1.05, category: "Chaveiro", origin: "Boca a Boca" },
@@ -41,18 +40,14 @@ const rawData: Omit<Sale, 'docId'>[] = [
   { id: 30, date: new Date('11/08/2025'), client: 'Neia', product: 'Letreiro "Cantinho do Café"', quantity: 1, price: 40.00, materialCost: 6.00, category: "Letreiro", origin: "Boca a Boca" },
 ];
 
-
 export async function importSalesFromExcelData() {
     console.log(`Iniciando importação de ${rawData.length} vendas...`);
 
     for (const sale of rawData) {
         try {
-            // Chamada à sua função original
-            await addSale(sale); 
-            
+          await addSale(sale); 
             // Pequeno delay para evitar sobrecarga (opcional, mas recomendado para muitos docs)
             // await new Promise(resolve => setTimeout(resolve, 50)); 
-
         } catch (error) {
             console.error(`Erro ao adicionar venda ID ${sale.id} (${sale.product}):`, error);
         }
