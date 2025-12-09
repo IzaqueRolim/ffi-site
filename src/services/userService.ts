@@ -78,6 +78,7 @@ export async function registerUser(data: RegisterUserDTO) {
     lastLogin: null,
   });
 
+
   return {
     docId: docRef.id,
     name,

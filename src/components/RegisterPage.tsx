@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { registerUser } from "../services/userService";
+import styles from "./Register.module.css";
 
-export function RegisterPage() {
+interface SidebarProps {
+  onSelect: (key: string) => void;
+}
+
+export const RegisterPage:React.FC<SidebarProps> = () =>{
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -41,9 +46,9 @@ export function RegisterPage() {
   }
 
   return (
-    <div>
-      <form onSubmit={handleRegister}>
-        <h2>Cadastro</h2>
+     <div className={styles.container}>
+      <form onSubmit={handleRegister} className={styles.card}>
+        <h2 className={styles.title}>Criar Conta</h2>
 
         <input
           type="text"
@@ -51,6 +56,7 @@ export function RegisterPage() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          className={styles.input}
         />
 
         <input
@@ -59,6 +65,7 @@ export function RegisterPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className={styles.input}
         />
 
         <input
@@ -67,6 +74,7 @@ export function RegisterPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          className={styles.input}
         />
 
         <input
@@ -75,9 +83,10 @@ export function RegisterPage() {
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
+          className={styles.input}
         />
 
-        <button type="submit" disabled={loading}>
+        <button className={styles.button} disabled={loading}>
           {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
       </form>
